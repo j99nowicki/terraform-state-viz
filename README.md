@@ -1,6 +1,8 @@
 # terraform-state-viz
 Visualise Terraform state with Graphviz
 
+![Sample 1 zone](https://github.com/j99nowicki/terraform-state-viz/blob/master/doc/sample-1zone.png?raw=true)
+
 ## Build and test
     mvn clean package
 
