@@ -4,7 +4,7 @@
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.jakub.tfutil</groupId>
-	<artifactId>terraform-aws-viz</artifactId>
+	<artifactId>terraform-state-viz</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<properties>
@@ -49,7 +49,7 @@
 		</repository>
 	</repositories>
 	<build>
-		<finalName>terraform-aws-viz</finalName>
+		<finalName>terraform-state-viz</finalName>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
 			<plugin>
