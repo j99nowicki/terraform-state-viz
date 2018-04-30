@@ -41,7 +41,8 @@ public class TerraformStateViz{
         System.out.println();
 
         TerraformStateViz terraformRcsViz = new TerraformStateViz();
-        JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraform.tfstate");
+//        JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraform.tfstate");
+        JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraformVpcSecGr.tfstate");
         
         Model model = terraformRcsViz.buildModel(stateJson);
 		System.out.println(model);
