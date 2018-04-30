@@ -3,8 +3,6 @@ package com.jakub.tfutil;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -43,7 +41,6 @@ public class TerraformRcsViz{
         System.out.println();
 
         TerraformRcsViz terraformRcsViz = new TerraformRcsViz();
-        //terraformRcsViz.jsonToJava();
         JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraform.tfstate");
         
         Model model = terraformRcsViz.buildModel(stateJson);
@@ -53,13 +50,6 @@ public class TerraformRcsViz{
 		System.out.println(diagram);
 		
 	}
-	
-	public void jsonToJava() throws IOException {
-        try(Reader reader = new InputStreamReader(TerraformRcsViz.class.getResourceAsStream("/Person.json"), "UTF-8")){
-            Person p = gson.fromJson(reader, Person.class);
-            System.out.println(p);
-        }
-    }
 	
 	public JsonObject parseStateFile (String stateFileName){
 
@@ -72,7 +62,6 @@ public class TerraformRcsViz{
             jsonObject = jsonElement.getAsJsonObject();
             return jsonObject;
         } catch (FileNotFoundException e) {
-        } catch (IOException ioe){
         }
         return jsonObject;
     }
@@ -137,20 +126,3 @@ public class TerraformRcsViz{
 		}
 	}
 }
-
-//Set<String> keys = resourcesJson.keySet();     
-//for (String key : keys) {
-//	System.out.println(key);
-//}
-
-//for (int i = 0; i < modules.size(); i++) {
-//	System.out.println(modules.get(i).toString());
-//	
-//}
-//for (JsonElement module : modules) {
-//	System.out.println(module.toString());
-//}
-//Set<String> keys = modules.keySet();
-//for (String key : keys) {
-//	System.out.println(key);
-//}
