@@ -44,8 +44,7 @@ public class TerraformRcsViz{
 
         TerraformRcsViz terraformRcsViz = new TerraformRcsViz();
         //terraformRcsViz.jsonToJava();
-        JsonObject stateJson = terraformRcsViz.parseStateFile("C:\\workspace\\eclipse\\terraform-aws-viz\\src\\main\\resources\\terraform.tfstate");
-//        JsonObject stateJson = terraformRcsViz.parseStateFile("C:\\workspace\\code\\terraform\\trial3\\terraform.tfstate");
+        JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraform.tfstate");
         
         Model model = terraformRcsViz.buildModel(stateJson);
 		System.out.println(model);
