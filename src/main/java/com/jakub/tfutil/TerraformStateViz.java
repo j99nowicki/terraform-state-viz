@@ -26,9 +26,9 @@ import com.jakub.tfutil.aws.vpc_endpoint.VpcEndpoint;
 import com.jakub.tfutil.aws.vpn_gateway.VpnGateway;
 import com.jakub.tfutil.diagram.GraphvizDiagram;
 
-public class TerraformRcsViz{
+public class TerraformStateViz{
 
-	static final Logger logger = Logger.getLogger(TerraformRcsViz.class);
+	static final Logger logger = Logger.getLogger(TerraformStateViz.class);
 	static Gson gson = new GsonBuilder().create();
 
 	public static void main(String[] args) throws IOException{
@@ -40,7 +40,7 @@ public class TerraformRcsViz{
         System.out.println();
         System.out.println();
 
-        TerraformRcsViz terraformRcsViz = new TerraformRcsViz();
+        TerraformStateViz terraformRcsViz = new TerraformStateViz();
         JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraform.tfstate");
         
         Model model = terraformRcsViz.buildModel(stateJson);

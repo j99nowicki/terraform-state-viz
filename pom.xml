@@ -68,7 +68,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.jakub.tfutil.TerraformAwsViz</mainClass>
+							<mainClass>com.jakub.tfutil.TerraformStateViz</mainClass>
 						</manifest>
 						<manifestEntries>
 							<Class-Path>.</Class-Path>
@@ -81,7 +81,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.jakub.tfutil.TerraformAwsViz</mainClass>
+							<mainClass>com.jakub.tfutil.TerraformStateViz</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
