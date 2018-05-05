@@ -4,15 +4,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import com.jakub.tfutil.Model;
-import com.jakub.tfutil.aws.eip.Eip;
-import com.jakub.tfutil.aws.internet_gateway.InternetGateway;
-import com.jakub.tfutil.aws.nat_gateway.NatGateway;
-import com.jakub.tfutil.aws.route.Route;
-import com.jakub.tfutil.aws.route_table.RouteTable;
-import com.jakub.tfutil.aws.route_table_association.RouteTableAssociation;
-import com.jakub.tfutil.aws.subnet.Subnet;
-import com.jakub.tfutil.aws.vpc_endpoint.VpcEndpoint;
-import com.jakub.tfutil.aws.vpn_gateway.VpnGateway;
+import com.jakub.tfutil.aws.EipAttributes;
+import com.jakub.tfutil.aws.InstanceAttributes;
+import com.jakub.tfutil.aws.InternetGatewayAttributes;
+import com.jakub.tfutil.aws.VpnGatewayAttributes;
+import com.jakub.tfutil.aws.VpcAttributes;
+import com.jakub.tfutil.aws.NatGatewayAttributes;
+import com.jakub.tfutil.aws.RouteAttributes;
+import com.jakub.tfutil.aws.RouteTableAttributes;
+import com.jakub.tfutil.aws.RouteTableAssociationAttributes;
+import com.jakub.tfutil.aws.SubnetAttributes;
+import com.jakub.tfutil.aws.VpcEndpointAttributes;
 
 public class GraphvizDiagram{
 		
@@ -20,8 +22,8 @@ public class GraphvizDiagram{
 		boolean showRouteTables = true;
 		
 		HashSet<String> zones = model.findAvailabilityZones();
-		zones.clear();
-		zones.add("eu-west-1b");
+//		zones.clear();
+//		zones.add("eu-west-1b");
 	
 		StringBuffer diagram = new StringBuffer();
 		int c=0;
@@ -29,7 +31,7 @@ public class GraphvizDiagram{
 "digraph G {\n"+
 "    rankdir=TB;\n");
 		
-		com.jakub.tfutil.aws.vpc.Attributes modelsAttr = model.vpc.primary.attributes;
+		VpcAttributes modelsAttr = model.vpcAttributes;
 		diagram.append(
 //Vpc
 "    subgraph cluster_"+(c++)+" {\n"+
@@ -38,7 +40,7 @@ public class GraphvizDiagram{
 "        node [style=filled,color=white, shape=box];\n"+
 //"           a0 -> a1 -> a2 -> a3;\n"+
 "        label = \"VPC: "+ modelsAttr.tagsName+" ("+ modelsAttr.id+")\";\n"+
-"        \""+modelsAttr.id+"\" [label = \"{tfName: "+ model.vpc.getTfName()+"|id: "+modelsAttr.id+"| cidr_block: "+modelsAttr.cidr_block+"}\" shape = \"record\" ];\n");
+"        \""+modelsAttr.id+"\" [label = \"{tfName: "+ model.vpcAttributes.getTfName()+"|id: "+modelsAttr.id+"| cidr_block: "+modelsAttr.cidr_block+"}\" shape = \"record\" ];\n");
 
 //Gateways		
 		diagram.append(
@@ -47,9 +49,9 @@ public class GraphvizDiagram{
 "            label=Gateways\n");
 		
 //Igw
-		HashMap<String, InternetGateway> igws = model.internetGateways;
+		HashMap<String, InternetGatewayAttributes> igws = model.internetGatewaysAttributes;
 		for (String tfName : igws.keySet()) {
-			com.jakub.tfutil.aws.internet_gateway.Attributes attr = igws.get(tfName).primary.attributes;
+			InternetGatewayAttributes attr = igws.get(tfName);
 			diagram.append(
 "            subgraph cluster_"+(c++)+" {\n"+
 "                \"icon"+attr.id+"\" [label=\"Internet GW\" shape=lpromoter]\n"+
@@ -63,9 +65,9 @@ public class GraphvizDiagram{
 //Igw - end
 
 //Vpn Gw
-		HashMap<String, VpnGateway> vpnGws = model.vpnGateways;
+		HashMap<String, VpnGatewayAttributes> vpnGws = model.vpnGatewaysAttributes;
 		for (String tfName : vpnGws.keySet()) {
-			com.jakub.tfutil.aws.vpn_gateway.Attributes attr = vpnGws.get(tfName).primary.attributes;
+			VpnGatewayAttributes attr = vpnGws.get(tfName);
 			diagram.append(
 "            subgraph cluster_"+(c++)+" {\n"+
 "                \"icon"+attr.id+"\" [label=\"VPN GW\" shape=cds]\n"+
@@ -79,9 +81,9 @@ public class GraphvizDiagram{
 //Vpn Gw - end
 		
 //Vpc Endpoints
-		HashMap<String, VpcEndpoint> vpcEndpoints = model.vpcEndpoints;
-		for (String tfName : vpcEndpoints.keySet()) {
-			com.jakub.tfutil.aws.vpc_endpoint.Attributes attr = vpcEndpoints.get(tfName).primary.attributes;
+		HashMap<String, VpcEndpointAttributes> vpcEndpointsAttrs = model.vpcEndpointsAttributes;
+		for (String tfName : vpcEndpointsAttrs.keySet()) {
+			VpcEndpointAttributes attr = vpcEndpointsAttrs.get(tfName);
 			diagram.append(
 "            subgraph cluster_"+(c++)+" {\n"+
 "                \"icon"+attr.id+"\" [label=\"VPC Endpoint\" shape=cds]\n"+
@@ -107,9 +109,9 @@ public class GraphvizDiagram{
 "            label = \"Availability zone: "+ zone +"\"\n");
 		
 //Subnets		
-			HashMap<String, Subnet> subnets = model.findSubnetsInZone(zone);
-			for (String tfName : subnets.keySet()) {
-				com.jakub.tfutil.aws.subnet.Attributes attr = subnets.get(tfName).primary.attributes;
+			HashMap<String, SubnetAttributes> subnetsAttributes = model.findSubnetsAttributesInZone(zone);
+			for (String tfName : subnetsAttributes.keySet()) {
+				SubnetAttributes attr = subnetsAttributes.get(tfName);
 				diagram.append(
 "            subgraph cluster_"+(c++)+" {\n"+
 "                node [style=filled];\n"+
@@ -117,10 +119,27 @@ public class GraphvizDiagram{
 "                label = \"Subnet: "+ attr.tagsName+"\"\n"+
 "                \""+attr.id+"\" [label = \"{tfName: "+ tfName+"|id: "+attr.id+"|cidr_block: "+attr.cidr_block+"}\" shape = \"record\" ];\n");
 
+//Instances
+				HashMap<String, InstanceAttributes> instancesAttributes = model.findInstancesInSubnet(attr.id);
+				for (String tfNameGw : instancesAttributes.keySet()) {
+					InstanceAttributes attrInstance = instancesAttributes.get(tfNameGw);
+					diagram.append(
+"                subgraph cluster_"+(c++)+" {\n"+
+"                    \"icon-"+attrInstance.id+"\" [label=EC2 shape=rpromoter]\n"+
+"                    node [style=filled];\n"+
+"                    color=blue\n"+
+"                    label = \"EC2: "+ attr.tagsName+"\"\n"+
+"                    \""+attrInstance.id+"\" [label = \"{tfName: "+ tfNameGw+"|id: "+attrInstance.id+"|public IP: "+attrInstance.public_ip+"|private IP: "+attrInstance.private_ip+"}\" shape = \"record\" ];\n");
+//Instances - end
+					diagram.append(					
+"                }\n");
+				}
+//Nat - end
+				
 //Nat Gw
-				HashMap<String, NatGateway> ngws = model.findNatGatewaysInSubnet(attr.id);
-				for (String tfNameGw : ngws.keySet()) {
-					com.jakub.tfutil.aws.nat_gateway.Attributes attrGw = ngws.get(tfNameGw).primary.attributes;
+				HashMap<String, NatGatewayAttributes> ngwsAttrs = model.findNatGatewaysAttributesInSubnet(attr.id);
+				for (String tfNameGw : ngwsAttrs.keySet()) {
+					NatGatewayAttributes attrGw = ngwsAttrs.get(tfNameGw);
 					diagram.append(
 "                subgraph cluster_"+(c++)+" {\n"+
 "                    \"icon-"+attrGw.id+"\" [label=NatGW shape=rpromoter]\n"+
@@ -130,10 +149,9 @@ public class GraphvizDiagram{
 "                    \""+attrGw.id+"\" [label = \"{tfName: "+ tfNameGw+"|id: "+attrGw.id+"|public IP: "+attrGw.public_ip+"|private IP: "+attrGw.private_ip+"}\" shape = \"record\" ];\n");
 
 //Eip
-					Eip eip = model.findEip(attrGw.allocation_id);
-					com.jakub.tfutil.aws.eip.Attributes attrEip = eip.primary.attributes;
+					EipAttributes eipAttributes = model.findEipAttributes(attrGw.allocation_id);
 					diagram.append(			
-"                    \"icon-"+attrEip.id+"\" [label=\"Elastic IP\" shape=house color=yellow]\n");
+"                    \"icon-"+eipAttributes.id+"\" [label=\"Elastic IP\" shape=house color=yellow]\n");
 //Eip - end
 					diagram.append(					
 "                }\n");
@@ -151,10 +169,10 @@ public class GraphvizDiagram{
 		}
 
 //Route tables
-		HashMap<String, RouteTable> routeTables = model.routeTables;
+		HashMap<String, RouteTableAttributes> routeTablesAttributes = model.routeTablesAttributes;
 		if (showRouteTables){
-			for (String tfName : routeTables.keySet()) {
-				com.jakub.tfutil.aws.route_table.Attributes attr = routeTables.get(tfName).primary.attributes;
+			for (String tfName : routeTablesAttributes.keySet()) {
+				RouteTableAttributes attr = routeTablesAttributes.get(tfName);
 				diagram.append(
 "        subgraph cluster_"+(c++)+" {\n"+
 "            node [style=filled];\n"+
@@ -167,25 +185,25 @@ public class GraphvizDiagram{
 //Route tables - end		
 		
 //Route table associations
-		HashMap<String, RouteTableAssociation> routeTableAssociations = model.routeTableAssociations;
-		for (String tfName : routeTableAssociations.keySet()) {
-			com.jakub.tfutil.aws.route_table_association.Attributes attr = routeTableAssociations.get(tfName).primary.attributes;
-			Subnet subnet = model.findSubnet(attr.subnet_id);
-			RouteTable routeTable = model.findRouteTable(attr.route_table_id);
+		HashMap<String, RouteTableAssociationAttributes> routeTableAssociationsAttributes = model.routeTableAssociationsAttributes;
+		for (String tfName : routeTableAssociationsAttributes.keySet()) {
+			RouteTableAssociationAttributes attr = routeTableAssociationsAttributes.get(tfName);
+			SubnetAttributes subnetAttributes = model.findSubnetAttributes(attr.subnet_id);
+			RouteTableAttributes routeTableAttributes = model.findRouteTableAttributes(attr.route_table_id);
 			
-			if (subnet!=null && routeTable!=null && zones.contains(subnet.primary.attributes.availability_zone)){
+			if (subnetAttributes!=null && routeTableAttributes!=null && zones.contains(subnetAttributes.availability_zone)){
 				if (showRouteTables){
-					diagram.append("        \""+subnet.primary.attributes.id+"\" -> \""+ routeTable.primary.attributes.id +"\" [label = \""+attr.id+"\" dir=none, style=dashed]\n");
+					diagram.append("        \""+subnetAttributes.id+"\" -> \""+ routeTableAttributes.id +"\" [label = \""+attr.id+"\" dir=none, style=dashed]\n");
 				}
 //Routes - find all routes belonging to the route table and connect it to the gateway
-				HashMap<String, Route> matchingRoutes = model.findRoutesInTable(routeTable.primary.attributes.id);
-				for (String tfNameRoute : matchingRoutes.keySet()) {
-					String gatewayId = matchingRoutes.get(tfNameRoute).primary.attributes.gateway_id;		
-					String natGatewayId = matchingRoutes.get(tfNameRoute).primary.attributes.nat_gateway_id;
+				HashMap<String, RouteAttributes> matchingRoutesAttributes = model.findRoutesAttributesInTable(routeTableAttributes.id);
+				for (String tfNameRoute : matchingRoutesAttributes.keySet()) {
+					String gatewayId = matchingRoutesAttributes.get(tfNameRoute).gateway_id;		
+					String natGatewayId = matchingRoutesAttributes.get(tfNameRoute).nat_gateway_id;
 					if (!"".equals(gatewayId) && gatewayId!=null){
-						diagram.append("        \""+subnet.primary.attributes.id+"\" -> \""+ gatewayId +"\" [label = \""+attr.id+"\" dir=both]\n");						
+						diagram.append("        \""+subnetAttributes.id+"\" -> \""+ gatewayId +"\" [label = \""+attr.id+"\" dir=both]\n");						
 					} else if (!"".equals(natGatewayId) && natGatewayId!=null){
-						diagram.append("        \""+subnet.primary.attributes.id+"\" -> \""+ natGatewayId +"\" [label = \""+attr.id+"\" ]\n");						
+						diagram.append("        \""+subnetAttributes.id+"\" -> \""+ natGatewayId +"\" [label = \""+attr.id+"\" ]\n");						
 					}
 				}
 				
@@ -207,13 +225,13 @@ public class GraphvizDiagram{
 			
 //Internet
 			for (String tfName : igws.keySet()) {
-				com.jakub.tfutil.aws.internet_gateway.Attributes attr = igws.get(tfName).primary.attributes;
+				InternetGatewayAttributes attr = igws.get(tfName);
 				diagram.append(
 "           \""+attr.id+"\" -> Internet [dir=both]\n");
 			}
-			HashMap<String, NatGateway> ngws = model.findNatGatewaysInZones(zones);
-			for (String tfName : ngws.keySet()) {
-				com.jakub.tfutil.aws.nat_gateway.Attributes attr = ngws.get(tfName).primary.attributes;
+			HashMap<String, NatGatewayAttributes> ngwsAttrs = model.findNatGatewaysAttributesInZones(zones);
+			for (String tfName : ngwsAttrs.keySet()) {
+				NatGatewayAttributes attr = ngwsAttrs.get(tfName);
 				diagram.append(
 "           \""+attr.id+"\" -> Internet\n");
 			}
@@ -221,15 +239,15 @@ public class GraphvizDiagram{
 
 //External Data Centre
 			for (String tfName : vpnGws.keySet()) {
-				com.jakub.tfutil.aws.vpn_gateway.Attributes attr = vpnGws.get(tfName).primary.attributes;
+				VpnGatewayAttributes attr = vpnGws.get(tfName);
 				diagram.append(
 "           \""+attr.id+"\" -> \"External Data Centre\" [dir=both]\n");
 			}		
 //External Data Centre - end
 		
 //Endpoints
-			for (String tfName : vpcEndpoints.keySet()) {
-				com.jakub.tfutil.aws.vpc_endpoint.Attributes attr = vpcEndpoints.get(tfName).primary.attributes;
+			for (String tfName : vpcEndpointsAttrs.keySet()) {
+				VpcEndpointAttributes attr = vpcEndpointsAttrs.get(tfName);
 				diagram.append(
 "           \""+attr.id+"\" -> \"AWS "+attr.service_name+"\" \n");
 			}		

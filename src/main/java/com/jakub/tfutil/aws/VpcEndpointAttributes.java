@@ -1,10 +1,10 @@
-package com.jakub.tfutil.aws.vpc_endpoint;
+package com.jakub.tfutil.aws;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Attributes {
+public class VpcEndpointAttributes {
 
 	@SerializedName("cidr_blocks.#")
 	public String CidrBlocksCount;

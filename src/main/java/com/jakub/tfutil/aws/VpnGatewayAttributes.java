@@ -1,18 +1,17 @@
-package com.jakub.tfutil.aws.route_table;
+package com.jakub.tfutil.aws;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Attributes {
-
-	public String destination_cidr_block;
+public class VpnGatewayAttributes {
+	public String vpc_id;
 	public String id;
+	public int amazon_side_asn;
 	@SerializedName("tags.%")
 	public int tagsCount;
 	@SerializedName("tags.Name")
 	public String tagsName;
-	public String vpc_id;
 	
 	@Override
 	public String toString()

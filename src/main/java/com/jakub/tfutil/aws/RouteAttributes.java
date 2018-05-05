@@ -1,8 +1,8 @@
-package com.jakub.tfutil.aws.route;
+package com.jakub.tfutil.aws;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public class Attributes {
+public class RouteAttributes {
 
 	public String destination_cidr_block;
 	public String destination_ipv6_cidr_block;

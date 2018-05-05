@@ -14,16 +14,19 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.jakub.tfutil.aws.eip.Eip;
-import com.jakub.tfutil.aws.internet_gateway.InternetGateway;
-import com.jakub.tfutil.aws.nat_gateway.NatGateway;
-import com.jakub.tfutil.aws.route.Route;
-import com.jakub.tfutil.aws.route_table.RouteTable;
-import com.jakub.tfutil.aws.route_table_association.RouteTableAssociation;
-import com.jakub.tfutil.aws.subnet.Subnet;
-import com.jakub.tfutil.aws.vpc.Vpc;
-import com.jakub.tfutil.aws.vpc_endpoint.VpcEndpoint;
-import com.jakub.tfutil.aws.vpn_gateway.VpnGateway;
+import com.jakub.tfutil.aws.EipAttributes;
+import com.jakub.tfutil.aws.InstanceAttributes;
+import com.jakub.tfutil.aws.InternetGatewayAttributes;
+import com.jakub.tfutil.aws.VpnGatewayAttributes;
+import com.jakub.tfutil.aws.NatGatewayAttributes;
+import com.jakub.tfutil.aws.RouteAttributes;
+import com.jakub.tfutil.aws.RouteTableAttributes;
+import com.jakub.tfutil.aws.RouteTableAssociationAttributes;
+import com.jakub.tfutil.aws.SecurityGroupAttributes;
+import com.jakub.tfutil.aws.SecurityGroupRuleAttributes;
+import com.jakub.tfutil.aws.SubnetAttributes;
+import com.jakub.tfutil.aws.VpcAttributes;
+import com.jakub.tfutil.aws.VpcEndpointAttributes;
 import com.jakub.tfutil.diagram.GraphvizDiagram;
 
 public class TerraformStateViz{
@@ -42,10 +45,10 @@ public class TerraformStateViz{
 
         TerraformStateViz terraformRcsViz = new TerraformStateViz();
 //        JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraform.tfstate");
-        JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraformVpcSecGr.tfstate");
+        JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraformVpcSecGrEc2.tfstate");
         
         Model model = terraformRcsViz.buildModel(stateJson);
-		System.out.println(model);
+		//System.out.println(model);
 		GraphvizDiagram graphvizDiagram = new GraphvizDiagram();
 		String diagram = graphvizDiagram.draw(model);
 		System.out.println(diagram);
@@ -76,7 +79,7 @@ public class TerraformStateViz{
 	    	JsonElement je = it.next();
 	    	readModule(model, je);			
 	    }
-		if (model.vpc == null){
+		if (model.vpcAttributes == null){
 			System.out.println("TF State file empty - leaving");
 			System.exit(1);
 		}
@@ -89,41 +92,59 @@ public class TerraformStateViz{
 
 		Set<String> keys = resources.keySet();
 		for (String tfName : keys) {
-			String typeWithQuotes = resources.getAsJsonObject(tfName).get("type").toString();
-			String type = typeWithQuotes.substring(1,typeWithQuotes.length()-1);
+			String type = getElementAsString(resources.getAsJsonObject(tfName).get("type"));
+			JsonObject resource = resources.getAsJsonObject(tfName);
+			JsonObject primary = resource.getAsJsonObject("primary");
+//			String id = getElementAsString(primary.get("id"));
+			JsonElement jsonElement = primary.get("attributes");
 			System.out.println(type);
+			if ("aws_instance".equals(type)) {
+				model.instancesAttributes.put(tfName, gson.fromJson(jsonElement, InstanceAttributes.class));
+			}
 			if ("aws_vpc_endpoint".equals(type)) {
-				model.vpcEndpoints.put(tfName, gson.fromJson(resources.getAsJsonObject(tfName), VpcEndpoint.class));
+				model.vpcEndpointsAttributes.put(tfName, gson.fromJson(jsonElement, VpcEndpointAttributes.class));
+			}
+			if ("aws_security_group".equals(type)) {
+				model.securityGroupsAttributes.put(tfName, gson.fromJson(jsonElement, SecurityGroupAttributes.class));
+			}
+			if ("aws_security_group_rule".equals(type)) {
+				model.securityGroupRulesAttributes.put(tfName, gson.fromJson(jsonElement, SecurityGroupRuleAttributes.class));
 			}
 			if ("aws_vpn_gateway".equals(type)) {
-				model.vpnGateways.put(tfName, gson.fromJson(resources.getAsJsonObject(tfName), VpnGateway.class));
+				model.vpnGatewaysAttributes.put(tfName, gson.fromJson(jsonElement, VpnGatewayAttributes.class));
 			}
 			if ("aws_eip".equals(type)) {
-				model.eips.put(tfName, gson.fromJson(resources.getAsJsonObject(tfName), Eip.class));
+				model.eipsAttributes.put(tfName, gson.fromJson(jsonElement, EipAttributes.class));
 			}
 			if ("aws_internet_gateway".equals(type)) {
-				model.internetGateways.put(tfName, gson.fromJson(resources.getAsJsonObject(tfName), InternetGateway.class));
+				model.internetGatewaysAttributes.put(tfName, gson.fromJson(jsonElement, InternetGatewayAttributes.class));
 			}
 			if ("aws_nat_gateway".equals(type)) {
-				model.natGateways.put(tfName, gson.fromJson(resources.getAsJsonObject(tfName), NatGateway.class));
+				model.natGatewaysAttributes.put(tfName, gson.fromJson(jsonElement, NatGatewayAttributes.class));
 			}
 			if ("aws_route".equals(type)) {
-				model.routes.put(tfName, gson.fromJson(resources.getAsJsonObject(tfName), Route.class));
+				model.routesAttributes.put(tfName, gson.fromJson(jsonElement, RouteAttributes.class));
 			}
 			if ("aws_route_table".equals(type)) {
-				model.routeTables.put(tfName, gson.fromJson(resources.getAsJsonObject(tfName), RouteTable.class));
+				model.routeTablesAttributes.put(tfName, gson.fromJson(jsonElement, RouteTableAttributes.class));
 			}
 			if ("aws_route_table_association".equals(type)) {
-				model.routeTableAssociations.put(tfName, gson.fromJson(resources.getAsJsonObject(tfName), RouteTableAssociation.class));
+				model.routeTableAssociationsAttributes.put(tfName, gson.fromJson(jsonElement, RouteTableAssociationAttributes.class));
 			}
 			if ("aws_subnet".equals(type)) {
-				model.subnets.put(tfName, gson.fromJson(resources.getAsJsonObject(tfName), Subnet.class));
+				model.subnetsAttributes.put(tfName, gson.fromJson(jsonElement, SubnetAttributes.class));
 			}
 			if ("aws_vpc".equals(type)) {
-				Vpc vpc = gson.fromJson(resources.getAsJsonObject(tfName), Vpc.class);
-				vpc.setTfName(tfName);
-				model.vpc = vpc;
+				VpcAttributes vpcAttributes = gson.fromJson(jsonElement, VpcAttributes.class);
+				vpcAttributes.setTfName(tfName);
+				model.vpcAttributes = vpcAttributes;
 			}
 		}
+	}
+
+	private String getElementAsString(JsonElement idJsonElement) {
+		String idWithQuotes = idJsonElement.toString();
+		String value = idWithQuotes .substring(1,idWithQuotes.length()-1);
+		return value;
 	}
 }

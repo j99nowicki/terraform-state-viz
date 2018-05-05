@@ -1,10 +1,13 @@
-package com.jakub.tfutil.aws.subnet;
+package com.jakub.tfutil.aws;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public class Primary {
+public class RouteTableAssociationAttributes {
+
+	public String route_table_id;
 	public String id;
-	public Attributes attributes;
+	public String subnet_id;
+	
 	@Override
 	public String toString()
 	{
