@@ -14,19 +14,19 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.jakub.tfutil.aws.EipAttributes;
-import com.jakub.tfutil.aws.InstanceAttributes;
-import com.jakub.tfutil.aws.InternetGatewayAttributes;
-import com.jakub.tfutil.aws.VpnGatewayAttributes;
-import com.jakub.tfutil.aws.NatGatewayAttributes;
-import com.jakub.tfutil.aws.RouteAttributes;
-import com.jakub.tfutil.aws.RouteTableAttributes;
-import com.jakub.tfutil.aws.RouteTableAssociationAttributes;
-import com.jakub.tfutil.aws.SecurityGroupAttributes;
-import com.jakub.tfutil.aws.SecurityGroupRuleAttributes;
-import com.jakub.tfutil.aws.SubnetAttributes;
-import com.jakub.tfutil.aws.VpcAttributes;
-import com.jakub.tfutil.aws.VpcEndpointAttributes;
+import com.jakub.tfutil.aws.attributes.EipAttributes;
+import com.jakub.tfutil.aws.attributes.InstanceAttributes;
+import com.jakub.tfutil.aws.attributes.InternetGatewayAttributes;
+import com.jakub.tfutil.aws.attributes.NatGatewayAttributes;
+import com.jakub.tfutil.aws.attributes.RouteAttributes;
+import com.jakub.tfutil.aws.attributes.RouteTableAssociationAttributes;
+import com.jakub.tfutil.aws.attributes.RouteTableAttributes;
+import com.jakub.tfutil.aws.attributes.SecurityGroupAttributes;
+import com.jakub.tfutil.aws.attributes.SecurityGroupRuleAttributes;
+import com.jakub.tfutil.aws.attributes.SubnetAttributes;
+import com.jakub.tfutil.aws.attributes.VpcAttributes;
+import com.jakub.tfutil.aws.attributes.VpcEndpointAttributes;
+import com.jakub.tfutil.aws.attributes.VpnGatewayAttributes;
 import com.jakub.tfutil.diagram.GraphvizDiagram;
 
 public class TerraformStateViz{
@@ -135,9 +135,7 @@ public class TerraformStateViz{
 				model.subnetsAttributes.put(tfName, gson.fromJson(jsonElement, SubnetAttributes.class));
 			}
 			if ("aws_vpc".equals(type)) {
-				VpcAttributes vpcAttributes = gson.fromJson(jsonElement, VpcAttributes.class);
-				vpcAttributes.setTfName(tfName);
-				model.vpcAttributes = vpcAttributes;
+				model.vpcAttributes.put(tfName, gson.fromJson(jsonElement, VpcAttributes.class));
 			}
 		}
 	}

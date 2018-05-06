@@ -1,4 +1,4 @@
-package com.jakub.tfutil.aws;
+package com.jakub.tfutil.aws.attributes;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 

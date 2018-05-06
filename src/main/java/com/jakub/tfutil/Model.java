@@ -5,22 +5,22 @@ import java.util.HashSet;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import com.jakub.tfutil.aws.EipAttributes;
-import com.jakub.tfutil.aws.InstanceAttributes;
-import com.jakub.tfutil.aws.InternetGatewayAttributes;
-import com.jakub.tfutil.aws.VpnGatewayAttributes;
-import com.jakub.tfutil.aws.NatGatewayAttributes;
-import com.jakub.tfutil.aws.RouteAttributes;
-import com.jakub.tfutil.aws.SecurityGroupRuleAttributes;
-import com.jakub.tfutil.aws.RouteTableAttributes;
-import com.jakub.tfutil.aws.RouteTableAssociationAttributes;
-import com.jakub.tfutil.aws.SecurityGroupAttributes;
-import com.jakub.tfutil.aws.SubnetAttributes;
-import com.jakub.tfutil.aws.VpcAttributes;
-import com.jakub.tfutil.aws.VpcEndpointAttributes;
+import com.jakub.tfutil.aws.attributes.EipAttributes;
+import com.jakub.tfutil.aws.attributes.InstanceAttributes;
+import com.jakub.tfutil.aws.attributes.InternetGatewayAttributes;
+import com.jakub.tfutil.aws.attributes.NatGatewayAttributes;
+import com.jakub.tfutil.aws.attributes.RouteAttributes;
+import com.jakub.tfutil.aws.attributes.RouteTableAssociationAttributes;
+import com.jakub.tfutil.aws.attributes.RouteTableAttributes;
+import com.jakub.tfutil.aws.attributes.SecurityGroupAttributes;
+import com.jakub.tfutil.aws.attributes.SecurityGroupRuleAttributes;
+import com.jakub.tfutil.aws.attributes.SubnetAttributes;
+import com.jakub.tfutil.aws.attributes.VpcAttributes;
+import com.jakub.tfutil.aws.attributes.VpcEndpointAttributes;
+import com.jakub.tfutil.aws.attributes.VpnGatewayAttributes;
 
 public class Model {
-	public VpcAttributes vpcAttributes;
+	public HashMap<String, VpcAttributes> vpcAttributes;
 	public HashMap<String, SubnetAttributes> subnetsAttributes;
 	public HashMap<String, RouteAttributes> routesAttributes;
 	public HashMap<String, RouteTableAttributes> routeTablesAttributes;
@@ -35,7 +35,7 @@ public class Model {
 	public HashMap<String, InstanceAttributes> instancesAttributes;
 	
 	public Model() {
-		this.vpcAttributes = null;
+		this.vpcAttributes = new HashMap<>();
 		this.subnetsAttributes = new HashMap<>();
 		this.routesAttributes = new HashMap<>();
 		this.routeTablesAttributes = new HashMap<>();
@@ -79,56 +79,58 @@ public class Model {
 		return null;
 	}
 	public HashMap<String, RouteAttributes> findRoutesAttributesInTable(String routeTableId){
-		HashMap<String, RouteAttributes> matchingRoutesAttributes = new HashMap<>();
+		HashMap<String, RouteAttributes> matchingAttributes = new HashMap<>();
 		for (String tfName : routesAttributes.keySet()) {
 			RouteAttributes attr = routesAttributes.get(tfName);
 			if (attr.route_table_id.equals(routeTableId)){
-				matchingRoutesAttributes.put(attr.id, routesAttributes.get(tfName));
+				matchingAttributes.put(attr.id, attr);
 			}
 		}
-		return matchingRoutesAttributes;
+		return matchingAttributes;
 	}
 
-	public HashSet<String> findAvailabilityZones(){
+	public HashSet<String> findAvailabilityZonesInVpc(String vpcId){
 		HashSet<String> zones = new HashSet<String>();
 		for (String tfName : subnetsAttributes.keySet()) {
 			SubnetAttributes attr = subnetsAttributes.get(tfName);
-			zones.add(attr.availability_zone);
+			if (vpcId.equals(attr.vpc_id)){
+				zones.add(attr.availability_zone);
+			}
 		}
 		return zones;
 	}
 	
-	public HashMap<String, SubnetAttributes> findSubnetsAttributesInZone(String zone){
-		HashMap<String, SubnetAttributes> matchingSubnetsAttributes = new HashMap<>();
+	public HashMap<String, SubnetAttributes> findSubnetsAttributesInVpcInZone(String vpcId, String zone){
+		HashMap<String, SubnetAttributes> matchingAttributes = new HashMap<>();
 		for (String tfName : subnetsAttributes.keySet()) {
 			SubnetAttributes attr = subnetsAttributes.get(tfName);
-			if (attr.availability_zone.equals(zone)){
-				matchingSubnetsAttributes.put(tfName, subnetsAttributes.get(tfName));
+			if (attr.vpc_id.equals(vpcId) && attr.availability_zone.equals(zone)){
+				matchingAttributes.put(tfName, attr);
 			}
 		}
-		return matchingSubnetsAttributes;
+		return matchingAttributes;
 	}
 	
 	public HashMap<String, NatGatewayAttributes> findNatGatewaysAttributesInSubnet(String subnteId){
-		HashMap<String, NatGatewayAttributes> matchingNatGatewaysAttributes = new HashMap<>();
+		HashMap<String, NatGatewayAttributes> matchingAttributes = new HashMap<>();
 		for (String tfName : natGatewaysAttributes.keySet()) {
 			NatGatewayAttributes attr = natGatewaysAttributes.get(tfName);
 			if (attr.subnet_id.equals(subnteId)){
-				matchingNatGatewaysAttributes.put(tfName, natGatewaysAttributes.get(tfName));
+				matchingAttributes.put(tfName, attr);
 			}
 		}
-		return matchingNatGatewaysAttributes;
+		return matchingAttributes;
 	}
 	
 	public HashMap<String, InstanceAttributes> findInstancesInSubnet(String subnteId){
-		HashMap<String, InstanceAttributes> matchingInstancesAttributes = new HashMap<>();
+		HashMap<String, InstanceAttributes> matchingAttributes = new HashMap<>();
 		for (String tfName : instancesAttributes.keySet()) {
 			InstanceAttributes attr = instancesAttributes.get(tfName);
 			if (attr.subnet_id.equals(subnteId)){
-				matchingInstancesAttributes.put(tfName, instancesAttributes.get(tfName));
+				matchingAttributes.put(tfName, attr);
 			}
 		}
-		return matchingInstancesAttributes;
+		return matchingAttributes;
 	}	
 	
 	public EipAttributes findEipAttributes(String eipId){
@@ -143,16 +145,60 @@ public class Model {
 	}
 	
 	public HashMap<String, NatGatewayAttributes> findNatGatewaysAttributesInZones(HashSet<String> zones){
-		HashMap<String, NatGatewayAttributes> matchingNatGatewaysAttributes = new HashMap<>();
+		HashMap<String, NatGatewayAttributes> matchingAttributes = new HashMap<>();
 		HashMap<String, NatGatewayAttributes> allNatGatewaysAttributes = new HashMap<>();
 		for (String tfName : allNatGatewaysAttributes.keySet()) {
 			NatGatewayAttributes natGatewayAttributes = natGatewaysAttributes.get(tfName);
 			SubnetAttributes subnetAttributes = findSubnetAttributes(natGatewayAttributes.subnet_id);
 			if (zones.contains(subnetAttributes.availability_zone)){
-				matchingNatGatewaysAttributes.put(tfName, natGatewayAttributes);
+				matchingAttributes.put(tfName, natGatewayAttributes);
 			}
 		}
-		return matchingNatGatewaysAttributes;
+		return matchingAttributes;
+	}
+	
+	public HashMap<String, InternetGatewayAttributes> findInternetGatewaysAttributesInVpc(String vpcId) {
+		HashMap<String, InternetGatewayAttributes> matchingAttributes = new HashMap<>();
+		for (String tfName : internetGatewaysAttributes.keySet()) {
+			InternetGatewayAttributes attr = internetGatewaysAttributes.get(tfName);
+			if (attr.vpc_id.equals(vpcId)){
+				matchingAttributes.put(tfName, attr);
+			}
+		}
+		return matchingAttributes;
+	}
+
+	public HashMap<String, VpnGatewayAttributes> findVpnGatewaysAttributesInVpc(String vpcId) {
+		HashMap<String, VpnGatewayAttributes> matchingAttributes = new HashMap<>();
+		for (String tfName : vpnGatewaysAttributes.keySet()) {
+			VpnGatewayAttributes attr = vpnGatewaysAttributes.get(tfName);
+			if (attr.vpc_id.equals(vpcId)){
+				matchingAttributes.put(tfName, attr);
+			}
+		}
+		return matchingAttributes;
+	}
+	
+	public HashMap<String, VpcEndpointAttributes> findVpcEndpointAttributesInVpc(String vpcId) {
+		HashMap<String, VpcEndpointAttributes> matchingAttributes = new HashMap<>();
+		for (String tfName : vpcEndpointsAttributes.keySet()) {
+			VpcEndpointAttributes attr = vpcEndpointsAttributes.get(tfName);
+			if (attr.vpc_id.equals(vpcId)){
+				matchingAttributes.put(tfName, attr);
+			}
+		}
+		return matchingAttributes;
+	}
+
+	public HashMap<String, RouteTableAttributes> findRouteTablesAttributesInVpc(String vpcId) {
+		HashMap<String, RouteTableAttributes> matchingAttributes = new HashMap<>();
+		for (String tfName : routeTablesAttributes.keySet()) {
+			RouteTableAttributes attr = routeTablesAttributes.get(tfName);
+			if (attr.vpc_id.equals(vpcId)){
+				matchingAttributes.put(tfName, attr);
+			}
+		}
+		return matchingAttributes;
 	}
 	
 }
