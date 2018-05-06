@@ -45,7 +45,8 @@ public class TerraformStateViz{
 
         TerraformStateViz terraformRcsViz = new TerraformStateViz();
 //        JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraform.tfstate");
-        JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraformVpcSecGrEc2.tfstate");
+//        JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraformVpcSecGrEc2.tfstate");
+        JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraformDoubleVpc.tfstate");
         
         Model model = terraformRcsViz.buildModel(stateJson);
 		//System.out.println(model);
@@ -72,7 +73,6 @@ public class TerraformStateViz{
 		
 	public Model buildModel(JsonObject stateJson) {
 		Model model = new Model();		
-		//TODO only one VPC is supported
 		JsonArray modules = stateJson.getAsJsonArray("modules");
 		Iterator<JsonElement> it = modules.iterator();
 	    while(it.hasNext()) {
@@ -95,9 +95,9 @@ public class TerraformStateViz{
 			String type = getElementAsString(resources.getAsJsonObject(tfName).get("type"));
 			JsonObject resource = resources.getAsJsonObject(tfName);
 			JsonObject primary = resource.getAsJsonObject("primary");
-//			String id = getElementAsString(primary.get("id"));
+			String id = getElementAsString(primary.get("id"));
 			JsonElement jsonElement = primary.get("attributes");
-			System.out.println(type);
+			System.out.println("type: " + type + " id: " + id + " tfName: "+tfName);
 			if ("aws_instance".equals(type)) {
 				model.instancesAttributes.put(tfName, gson.fromJson(jsonElement, InstanceAttributes.class));
 			}
