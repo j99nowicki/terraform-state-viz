@@ -23,6 +23,10 @@ public class GraphvizDiagram{
 		
 		StringBuffer diagram = new StringBuffer();
 		int c=0;
+		HashMap<String, InternetGatewayAttributes> allDisplayedIgws = new HashMap<String, InternetGatewayAttributes>();
+		HashMap<String, VpnGatewayAttributes> allDisplayedVpnGws = new HashMap<String, VpnGatewayAttributes>();
+		HashMap<String, VpcEndpointAttributes> allDisplayedVpcEndpoints = new HashMap<String, VpcEndpointAttributes>();
+		HashSet<String> allDisplayedZones = new HashSet<String>();
 
 //Diagram
 		diagram.append(
@@ -58,6 +62,7 @@ public class GraphvizDiagram{
 			HashMap<String, InternetGatewayAttributes> igws = model.findInternetGatewaysAttributesInVpc(vpcAttr.id);
 			for (String tfName : igws.keySet()) {
 				InternetGatewayAttributes attr = igws.get(tfName);
+				allDisplayedIgws.put(tfName, attr);
 				diagram.append(
 "            subgraph cluster_"+(c++)+" {\n"+
 "                \"icon"+attr.id+"\" [label=\"Internet GW\" shape=lpromoter]\n"+
@@ -73,6 +78,7 @@ public class GraphvizDiagram{
 			HashMap<String, VpnGatewayAttributes> vpnGws = model.findVpnGatewaysAttributesInVpc(vpcAttr.id);
 			for (String tfName : vpnGws.keySet()) {
 				VpnGatewayAttributes attr = vpnGws.get(tfName);
+				allDisplayedVpnGws.put(tfName, attr);
 				diagram.append(
 "            subgraph cluster_"+(c++)+" {\n"+
 "                \"icon"+attr.id+"\" [label=\"VPN GW\" shape=cds]\n"+
@@ -88,6 +94,7 @@ public class GraphvizDiagram{
 			HashMap<String, VpcEndpointAttributes> vpcEndpointsAttrs = model.findVpcEndpointAttributesInVpc(vpcAttr.id);
 			for (String tfName : vpcEndpointsAttrs.keySet()) {
 				VpcEndpointAttributes attr = vpcEndpointsAttrs.get(tfName);
+				allDisplayedVpcEndpoints.put(tfName, attr);
 				diagram.append(
 "            subgraph cluster_"+(c++)+" {\n"+
 "                \"icon"+attr.id+"\" [label=\"VPC Endpoint\" shape=cds]\n"+
@@ -105,6 +112,7 @@ public class GraphvizDiagram{
 
 //Zones
 			for (String zone : zones) {
+				allDisplayedZones.add(zone);
 				diagram.append(
 "        subgraph cluster_"+(c++)+" {\n"+
 "            node [style=filled];\n"+
@@ -217,51 +225,52 @@ public class GraphvizDiagram{
 				
 //Route table associations - end
 			
-				
-//External
-			diagram.append(
-"        subgraph cluster_"+(c++)+" {\n"+
-"            style=\"invisible\";\n"+
-"            label=External\n");
-			
-//Internet
-			for (String tfName : igws.keySet()) {
-				InternetGatewayAttributes attr = model.internetGatewaysAttributes.get(tfName);
-				diagram.append(
-"            \""+attr.id+"\" -> Internet [dir=both]\n");
-			}
-			HashMap<String, NatGatewayAttributes> ngwsAttrs = model.findNatGatewaysAttributesInZones(zones);
-			for (String tfName : ngwsAttrs.keySet()) {
-				NatGatewayAttributes attr = ngwsAttrs.get(tfName);
-				diagram.append(
-"            \""+attr.id+"\" -> Internet\n");
-			}
-//Internet - end		
-
-//External Data Centre
-			for (String tfName : vpnGws.keySet()) {
-				VpnGatewayAttributes attr = model.vpnGatewaysAttributes.get(tfName);
-				diagram.append(
-"            \""+attr.id+"\" -> \"External Data Centre\" [dir=both]\n");
-			}		
-//External Data Centre - end
-		
-//Endpoints
-			for (String tfName : vpcEndpointsAttrs.keySet()) {
-				VpcEndpointAttributes attr = model.vpcEndpointsAttributes.get(tfName);
-				diagram.append(
-"            \""+attr.id+"\" -> \"AWS "+attr.service_name+"\" \n");
-			}		
-//Endpoints - end
-
-//External - end		
-			diagram.append(
-"        }\n");
-
 //Vpc - end
 			diagram.append(				
 "    }\n");	
 		}
+			
+//External
+		diagram.append(
+"    subgraph cluster_"+(c++)+" {\n"+
+"        style=\"invisible\";\n"+
+"        label=External\n");
+			
+//Internet
+		for (String tfName : allDisplayedIgws.keySet()) {
+			InternetGatewayAttributes attr = model.internetGatewaysAttributes.get(tfName);
+			diagram.append(
+"        \""+attr.id+"\" -> Internet [dir=both]\n");
+		}
+		HashMap<String, NatGatewayAttributes> ngwsAttrs = model.findNatGatewaysAttributesInZones(allDisplayedZones);
+		for (String tfName : ngwsAttrs.keySet()) {
+			NatGatewayAttributes attr = ngwsAttrs.get(tfName);
+			diagram.append(
+"        \""+attr.id+"\" -> Internet\n");
+		}
+//Internet - end		
+
+//External Data Centre
+		for (String tfName : allDisplayedVpnGws.keySet()) {
+			VpnGatewayAttributes attr = model.vpnGatewaysAttributes.get(tfName);
+			diagram.append(
+"        \""+attr.id+"\" -> \"External Data Centre\" [dir=both]\n");
+		}		
+//External Data Centre - end
+		
+//Endpoints
+		for (String tfName : allDisplayedVpcEndpoints.keySet()) {
+			VpcEndpointAttributes attr = model.vpcEndpointsAttributes.get(tfName);
+			diagram.append(
+"        \""+attr.id+"\" -> \"AWS "+attr.service_name+"\" \n");
+		}		
+//Endpoints - end
+
+//External - end		
+			diagram.append(
+"    }\n");
+
+
 		
 //Diagram- end
 		diagram.append(

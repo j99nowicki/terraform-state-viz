@@ -47,7 +47,8 @@ public class TerraformStateViz{
 //        JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraform.tfstate");
 //        JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraformVpcSecGrEc2.tfstate");
         JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraformDoubleVpc.tfstate");
-        
+//        JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraform_ireland.tfstate");
+                
         Model model = terraformRcsViz.buildModel(stateJson);
 		//System.out.println(model);
 		GraphvizDiagram graphvizDiagram = new GraphvizDiagram();
@@ -98,44 +99,45 @@ public class TerraformStateViz{
 			String id = getElementAsString(primary.get("id"));
 			JsonElement jsonElement = primary.get("attributes");
 			System.out.println("type: " + type + " id: " + id + " tfName: "+tfName);
+			String objectKey = id;
 			if ("aws_instance".equals(type)) {
-				model.instancesAttributes.put(tfName, gson.fromJson(jsonElement, InstanceAttributes.class));
+				model.instancesAttributes.put(objectKey, gson.fromJson(jsonElement, InstanceAttributes.class));
 			}
 			if ("aws_vpc_endpoint".equals(type)) {
-				model.vpcEndpointsAttributes.put(tfName, gson.fromJson(jsonElement, VpcEndpointAttributes.class));
+				model.vpcEndpointsAttributes.put(objectKey, gson.fromJson(jsonElement, VpcEndpointAttributes.class));
 			}
 			if ("aws_security_group".equals(type)) {
-				model.securityGroupsAttributes.put(tfName, gson.fromJson(jsonElement, SecurityGroupAttributes.class));
+				model.securityGroupsAttributes.put(objectKey, gson.fromJson(jsonElement, SecurityGroupAttributes.class));
 			}
 			if ("aws_security_group_rule".equals(type)) {
-				model.securityGroupRulesAttributes.put(tfName, gson.fromJson(jsonElement, SecurityGroupRuleAttributes.class));
+				model.securityGroupRulesAttributes.put(objectKey, gson.fromJson(jsonElement, SecurityGroupRuleAttributes.class));
 			}
 			if ("aws_vpn_gateway".equals(type)) {
-				model.vpnGatewaysAttributes.put(tfName, gson.fromJson(jsonElement, VpnGatewayAttributes.class));
+				model.vpnGatewaysAttributes.put(objectKey, gson.fromJson(jsonElement, VpnGatewayAttributes.class));
 			}
 			if ("aws_eip".equals(type)) {
-				model.eipsAttributes.put(tfName, gson.fromJson(jsonElement, EipAttributes.class));
+				model.eipsAttributes.put(objectKey, gson.fromJson(jsonElement, EipAttributes.class));
 			}
 			if ("aws_internet_gateway".equals(type)) {
-				model.internetGatewaysAttributes.put(tfName, gson.fromJson(jsonElement, InternetGatewayAttributes.class));
+				model.internetGatewaysAttributes.put(objectKey, gson.fromJson(jsonElement, InternetGatewayAttributes.class));
 			}
 			if ("aws_nat_gateway".equals(type)) {
-				model.natGatewaysAttributes.put(tfName, gson.fromJson(jsonElement, NatGatewayAttributes.class));
+				model.natGatewaysAttributes.put(objectKey, gson.fromJson(jsonElement, NatGatewayAttributes.class));
 			}
 			if ("aws_route".equals(type)) {
-				model.routesAttributes.put(tfName, gson.fromJson(jsonElement, RouteAttributes.class));
+				model.routesAttributes.put(objectKey, gson.fromJson(jsonElement, RouteAttributes.class));
 			}
 			if ("aws_route_table".equals(type)) {
-				model.routeTablesAttributes.put(tfName, gson.fromJson(jsonElement, RouteTableAttributes.class));
+				model.routeTablesAttributes.put(objectKey, gson.fromJson(jsonElement, RouteTableAttributes.class));
 			}
 			if ("aws_route_table_association".equals(type)) {
-				model.routeTableAssociationsAttributes.put(tfName, gson.fromJson(jsonElement, RouteTableAssociationAttributes.class));
+				model.routeTableAssociationsAttributes.put(objectKey, gson.fromJson(jsonElement, RouteTableAssociationAttributes.class));
 			}
 			if ("aws_subnet".equals(type)) {
-				model.subnetsAttributes.put(tfName, gson.fromJson(jsonElement, SubnetAttributes.class));
+				model.subnetsAttributes.put(objectKey, gson.fromJson(jsonElement, SubnetAttributes.class));
 			}
 			if ("aws_vpc".equals(type)) {
-				model.vpcAttributes.put(tfName, gson.fromJson(jsonElement, VpcAttributes.class));
+				model.vpcAttributes.put(objectKey, gson.fromJson(jsonElement, VpcAttributes.class));
 			}
 		}
 	}
