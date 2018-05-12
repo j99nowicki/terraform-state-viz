@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.gson.annotations.SerializedName;
 
-public class VpcAttributes {
+public class VpcAttributes extends TfAttributes{
 	public boolean assign_generated_ipv6_cidr_block;
 	public String cidr_block;
 	public String default_network_acl_id;
@@ -23,15 +23,6 @@ public class VpcAttributes {
 	@SerializedName("tags.Name")
 	public String tagsName;
 
-	//custom - TODO try removing
-    public String tfName;
-	public String getTfName() {
-		return tfName;
-	}
-	public void setTfName(String tfName) {
-		this.tfName = tfName;
-	} 	
-	
 	@Override
     public String toString()
     {

@@ -24,6 +24,7 @@ import com.jakub.tfutil.aws.attributes.RouteTableAttributes;
 import com.jakub.tfutil.aws.attributes.SecurityGroupAttributes;
 import com.jakub.tfutil.aws.attributes.SecurityGroupRuleAttributes;
 import com.jakub.tfutil.aws.attributes.SubnetAttributes;
+import com.jakub.tfutil.aws.attributes.TfAttributes;
 import com.jakub.tfutil.aws.attributes.VpcAttributes;
 import com.jakub.tfutil.aws.attributes.VpcEndpointAttributes;
 import com.jakub.tfutil.aws.attributes.VpnGatewayAttributes;
@@ -137,7 +138,9 @@ public class TerraformStateViz{
 				model.subnets.put(objectKey, gson.fromJson(jsonElement, SubnetAttributes.class));
 			}
 			if ("aws_vpc".equals(type)) {
-				model.vpcs.put(objectKey, gson.fromJson(jsonElement, VpcAttributes.class));
+				TfAttributes tfAttr = gson.fromJson(jsonElement, VpcAttributes.class);
+				tfAttr.tfName = tfName;
+				model.vpcs.put(objectKey, (VpcAttributes) tfAttr);
 			}
 		}
 	}

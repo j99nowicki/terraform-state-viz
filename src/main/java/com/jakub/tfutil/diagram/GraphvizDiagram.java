@@ -39,7 +39,7 @@ public class GraphvizDiagram{
 		for (String idVpc : vpcs.keySet()) {
 			VpcAttributes vpc = vpcs.get(idVpc);
 			
-			HashSet<String> zones = model.findAvailabilityZonesInVpc(vpc.id);
+			HashSet<String> zones = model.findAvailabilityZonesInVpc(idVpc);
 //			zones.clear();
 //			zones.add("eu-west-1b");
 			
@@ -50,7 +50,7 @@ public class GraphvizDiagram{
 "        node [style=filled,color=white, shape=box];\n"+
 //"           a0 -> a1 -> a2 -> a3;\n"+
 "        label = \"VPC: "+ vpc.tagsName+" ("+ vpc.id+")\";\n"+
-"        \""+vpc.id+"\" [label = \"{tfName: "+ idVpc +"|id: "+vpc.id+"| cidr_block: "+vpc.cidr_block+"}\" shape = \"record\" ];\n");
+"        \""+vpc.id+"\" [label = \"{tfName: "+ vpc.tfName +"|id: "+idVpc+"| cidr_block: "+vpc.cidr_block+"}\" shape = \"record\" ];\n");
 
 //Gateways		
 			diagram.append(
@@ -69,7 +69,7 @@ public class GraphvizDiagram{
 "                node [style=filled];\n"+
 "                color=red;\n"+
 "                style=\"filled,rounded\" label = \"Internet GW: "+ igw.tagsName+"\"\n"+
-"                \""+igw.id+"\" [label = \"{tfName: "+ idIgw+"|id: "+igw.id+"}\" shape = \"record\" ];\n"+
+"                \""+igw.id+"\" [label = \"{tfName: "+ idIgw+"|id: "+idIgw +"}\" shape = \"record\" ];\n"+
 "            }\n");
 			}
 //Igw - end
@@ -85,7 +85,7 @@ public class GraphvizDiagram{
 "                node [style=filled];\n"+
 "                color=royalblue1\n"+
 "                style=\"filled,rounded\" label = \"VPN GW: "+ vpnGw.tagsName+"\"\n"+
-"                \""+vpnGw.id+"\" [label = \"{tfName: "+ idVpnGw+"|id: "+vpnGw.id+"|amazon side ASN: "+vpnGw.amazon_side_asn+"}\" shape = \"record\" ];\n"+
+"                \""+vpnGw.id+"\" [label = \"{tfName: "+ idVpnGw+"|id: "+idVpnGw+"|amazon side ASN: "+vpnGw.amazon_side_asn+"}\" shape = \"record\" ];\n"+
 "            }\n");
 			}
 //Vpn Gw - end
@@ -101,7 +101,7 @@ public class GraphvizDiagram{
 "                node [style=filled];\n"+
 "                color=orchid1\n"+
 "                style=\"filled,rounded\" label = \"VPC Endpoint: "+ vpcEndpoint.vpc_endpoint_type+"\"\n"+
-"                \""+vpcEndpoint.id+"\" [label = \"{tfName: "+ idVpcEndpoint+"|id: "+vpcEndpoint.id+"|service_name: "+vpcEndpoint.service_name+"}\" shape = \"record\" ];\n"+
+"                \""+vpcEndpoint.id+"\" [label = \"{tfName: "+ idVpcEndpoint+"|id: "+idVpcEndpoint+"|service_name: "+vpcEndpoint.service_name+"}\" shape = \"record\" ];\n"+
 "            }\n");
 			}
 //Vpc Endpoints	- end
@@ -128,19 +128,19 @@ public class GraphvizDiagram{
 "                node [style=filled];\n"+
 "                color=green\n"+
 "                label = \"Subnet: "+ subnet.tagsName+"\"\n"+
-"                \""+subnet.id+"\" [label = \"{tfName: "+ idSubnet+"|id: "+subnet.id+"|cidr_block: "+subnet.cidr_block+"}\" shape = \"record\" ];\n");
+"                \""+subnet.id+"\" [label = \"{tfName: "+ idSubnet+"|id: "+idSubnet+"|cidr_block: "+subnet.cidr_block+"}\" shape = \"record\" ];\n");
 
 //Instances
 					HashMap<String, InstanceAttributes> instances = model.findInstancesInSubnet(subnet.id);
 					for (String idInstance : instances.keySet()) {
-						InstanceAttributes attrInstance = instances.get(idInstance);
+						InstanceAttributes instance = instances.get(idInstance);
 						diagram.append(
 "                subgraph cluster_"+(c++)+" {\n"+
-"                    \"icon-"+attrInstance.id+"\" [label=EC2 shape=rpromoter]\n"+
+"                    \"icon-"+instance.id+"\" [label=EC2 shape=rpromoter]\n"+
 "                    node [style=filled];\n"+
 "                    color=blue\n"+
 "                    label = \"EC2: "+ subnet.tagsName+"\"\n"+
-"                    \""+attrInstance.id+"\" [label = \"{tfName: "+ idInstance+"|id: "+attrInstance.id+"|public IP: "+attrInstance.public_ip+"|private IP: "+attrInstance.private_ip+"}\" shape = \"record\" ];\n");
+"                    \""+instance.id+"\" [label = \"{tfName: "+ idInstance+"|id: "+idInstance+"|public IP: "+instance.public_ip+"|private IP: "+instance.private_ip+"}\" shape = \"record\" ];\n");
 //Instances - end
 						diagram.append(					
 "                }\n");
@@ -157,7 +157,7 @@ public class GraphvizDiagram{
 "                    node [style=filled];\n"+
 "                    color=salmon\n"+
 "                    label = \"Nat GW: "+ subnet.tagsName+"\"\n"+
-"                    \""+natGw.id+"\" [label = \"{tfName: "+ idNatGw+"|id: "+natGw.id+"|public IP: "+natGw.public_ip+"|private IP: "+natGw.private_ip+"}\" shape = \"record\" ];\n");
+"                    \""+natGw.id+"\" [label = \"{tfName: "+ idNatGw+"|id: "+idNatGw+"|public IP: "+natGw.public_ip+"|private IP: "+natGw.private_ip+"}\" shape = \"record\" ];\n");
 
 //Eip
 						EipAttributes eipAttributes = model.findEipAttributes(natGw.allocation_id);
@@ -189,7 +189,7 @@ public class GraphvizDiagram{
 "            node [style=filled];\n"+
 "            color=mistyrose\n"+
 "            label = \"Route Table: "+ routeTable.tagsName+"\"\n"+
-"            \""+routeTable.id+"\" [label = \"{tfName: "+ idRouteTable+"|id: "+routeTable.id+"}\" shape = \"record\" ];\n"+
+"            \""+routeTable.id+"\" [label = \"{tfName: "+ idRouteTable+"|id: "+idRouteTable+"}\" shape = \"record\" ];\n"+
 "        }\n");
 				}
 			}	
@@ -205,7 +205,7 @@ public class GraphvizDiagram{
 				
 				if (subnet!=null && routeTable!=null && zones.contains(subnet.availability_zone)){
 					if (showRouteTables){
-						diagram.append("        \""+subnet.id+"\" -> \""+ routeTable.id +"\" [label = \""+routeTableAssociation.id+"\" dir=none, style=dashed]\n");
+						diagram.append("        \""+subnet.id+"\" -> \""+ routeTable.id +"\" [label = \""+idRouteTableAssociation+"\" dir=none, style=dashed]\n");
 					}
 //Routes - find all routes belonging to the route table and connect it to the gateway
 					HashMap<String, RouteAttributes> matchingRoutes = model.findRoutesAttributesInTable(routeTable.id);
@@ -213,9 +213,9 @@ public class GraphvizDiagram{
 						String gatewayId = matchingRoutes.get(idRoute).gateway_id;		
 						String natGatewayId = matchingRoutes.get(idRoute).nat_gateway_id;
 						if (!"".equals(gatewayId) && gatewayId!=null){
-							diagram.append("        \""+subnet.id+"\" -> \""+ gatewayId +"\" [label = \""+routeTableAssociation.id+"\" dir=both]\n");						
+							diagram.append("        \""+subnet.id+"\" -> \""+ gatewayId +"\" [label = \""+idRouteTableAssociation+"\" dir=both]\n");						
 						} else if (!"".equals(natGatewayId) && natGatewayId!=null){
-							diagram.append("        \""+subnet.id+"\" -> \""+ natGatewayId +"\" [label = \""+routeTableAssociation.id+"\" ]\n");						
+							diagram.append("        \""+subnet.id+"\" -> \""+ natGatewayId +"\" [label = \""+idRouteTableAssociation+"\" ]\n");						
 						}
 					}
 				
@@ -238,23 +238,23 @@ public class GraphvizDiagram{
 			
 //Internet
 		for (String idIgw : allDisplayedIgws.keySet()) {
-			InternetGatewayAttributes igw = model.internetGateways.get(idIgw);
+//			InternetGatewayAttributes igw = model.internetGateways.get(idIgw);
 			diagram.append(
-"        \""+igw.id+"\" -> Internet [dir=both]\n");
+"        \""+idIgw+"\" -> Internet [dir=both]\n");
 		}
 		HashMap<String, NatGatewayAttributes> displayedNatGws = model.findNatGatewaysAttributesInZones(allDisplayedZones);
 		for (String idNatGw : displayedNatGws.keySet()) {
-			NatGatewayAttributes natGw = displayedNatGws.get(idNatGw);
+//			NatGatewayAttributes natGw = displayedNatGws.get(idNatGw);
 			diagram.append(
-"        \""+natGw.id+"\" -> Internet\n");
+"        \""+idNatGw+"\" -> Internet\n");
 		}
 //Internet - end		
 
 //External Data Centre
 		for (String idVpnGw : allDisplayedVpnGws.keySet()) {
-			VpnGatewayAttributes vpnGw = model.vpnGateways.get(idVpnGw);
+//			VpnGatewayAttributes vpnGw = model.vpnGateways.get(idVpnGw);
 			diagram.append(
-"        \""+vpnGw.id+"\" -> \"External Data Centre\" [dir=both]\n");
+"        \""+idVpnGw+"\" -> \"External Data Centre\" [dir=both]\n");
 		}		
 //External Data Centre - end
 		
@@ -262,7 +262,7 @@ public class GraphvizDiagram{
 		for (String idVpcEndpoint : allDisplayedVpcEndpoints.keySet()) {
 			VpcEndpointAttributes vpcEndpoint = model.vpcEndpoints.get(idVpcEndpoint);
 			diagram.append(
-"        \""+vpcEndpoint.id+"\" -> \"AWS "+vpcEndpoint.service_name+"\" \n");
+"        \""+idVpcEndpoint+"\" -> \"AWS "+vpcEndpoint.service_name+"\" \n");
 		}		
 //Endpoints - end
 
