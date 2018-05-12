@@ -80,7 +80,7 @@ public class TerraformStateViz{
 	    	JsonElement je = it.next();
 	    	readModule(model, je);			
 	    }
-		if (model.vpcAttributes == null){
+		if (model.vpcs == null){
 			System.out.println("TF State file empty - leaving");
 			System.exit(1);
 		}
@@ -101,43 +101,43 @@ public class TerraformStateViz{
 			System.out.println("type: " + type + " id: " + id + " tfName: "+tfName);
 			String objectKey = id;
 			if ("aws_instance".equals(type)) {
-				model.instancesAttributes.put(objectKey, gson.fromJson(jsonElement, InstanceAttributes.class));
+				model.instances.put(objectKey, gson.fromJson(jsonElement, InstanceAttributes.class));
 			}
 			if ("aws_vpc_endpoint".equals(type)) {
-				model.vpcEndpointsAttributes.put(objectKey, gson.fromJson(jsonElement, VpcEndpointAttributes.class));
+				model.vpcEndpoints.put(objectKey, gson.fromJson(jsonElement, VpcEndpointAttributes.class));
 			}
 			if ("aws_security_group".equals(type)) {
-				model.securityGroupsAttributes.put(objectKey, gson.fromJson(jsonElement, SecurityGroupAttributes.class));
+				model.securityGroups.put(objectKey, gson.fromJson(jsonElement, SecurityGroupAttributes.class));
 			}
 			if ("aws_security_group_rule".equals(type)) {
-				model.securityGroupRulesAttributes.put(objectKey, gson.fromJson(jsonElement, SecurityGroupRuleAttributes.class));
+				model.securityGroupRules.put(objectKey, gson.fromJson(jsonElement, SecurityGroupRuleAttributes.class));
 			}
 			if ("aws_vpn_gateway".equals(type)) {
-				model.vpnGatewaysAttributes.put(objectKey, gson.fromJson(jsonElement, VpnGatewayAttributes.class));
+				model.vpnGateways.put(objectKey, gson.fromJson(jsonElement, VpnGatewayAttributes.class));
 			}
 			if ("aws_eip".equals(type)) {
-				model.eipsAttributes.put(objectKey, gson.fromJson(jsonElement, EipAttributes.class));
+				model.eips.put(objectKey, gson.fromJson(jsonElement, EipAttributes.class));
 			}
 			if ("aws_internet_gateway".equals(type)) {
-				model.internetGatewaysAttributes.put(objectKey, gson.fromJson(jsonElement, InternetGatewayAttributes.class));
+				model.internetGateways.put(objectKey, gson.fromJson(jsonElement, InternetGatewayAttributes.class));
 			}
 			if ("aws_nat_gateway".equals(type)) {
-				model.natGatewaysAttributes.put(objectKey, gson.fromJson(jsonElement, NatGatewayAttributes.class));
+				model.natGateways.put(objectKey, gson.fromJson(jsonElement, NatGatewayAttributes.class));
 			}
 			if ("aws_route".equals(type)) {
-				model.routesAttributes.put(objectKey, gson.fromJson(jsonElement, RouteAttributes.class));
+				model.routes.put(objectKey, gson.fromJson(jsonElement, RouteAttributes.class));
 			}
 			if ("aws_route_table".equals(type)) {
-				model.routeTablesAttributes.put(objectKey, gson.fromJson(jsonElement, RouteTableAttributes.class));
+				model.routeTables.put(objectKey, gson.fromJson(jsonElement, RouteTableAttributes.class));
 			}
 			if ("aws_route_table_association".equals(type)) {
-				model.routeTableAssociationsAttributes.put(objectKey, gson.fromJson(jsonElement, RouteTableAssociationAttributes.class));
+				model.routeTableAssociations.put(objectKey, gson.fromJson(jsonElement, RouteTableAssociationAttributes.class));
 			}
 			if ("aws_subnet".equals(type)) {
-				model.subnetsAttributes.put(objectKey, gson.fromJson(jsonElement, SubnetAttributes.class));
+				model.subnets.put(objectKey, gson.fromJson(jsonElement, SubnetAttributes.class));
 			}
 			if ("aws_vpc".equals(type)) {
-				model.vpcAttributes.put(objectKey, gson.fromJson(jsonElement, VpcAttributes.class));
+				model.vpcs.put(objectKey, gson.fromJson(jsonElement, VpcAttributes.class));
 			}
 		}
 	}
