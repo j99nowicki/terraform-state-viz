@@ -15,6 +15,7 @@ import com.jakub.tfutil.aws.attributes.RouteTableAttributes;
 import com.jakub.tfutil.aws.attributes.SecurityGroupAttributes;
 import com.jakub.tfutil.aws.attributes.SecurityGroupRuleAttributes;
 import com.jakub.tfutil.aws.attributes.SubnetAttributes;
+import com.jakub.tfutil.aws.attributes.SubnetIdsAttributes;
 import com.jakub.tfutil.aws.attributes.VpcAttributes;
 import com.jakub.tfutil.aws.attributes.VpcEndpointAttributes;
 import com.jakub.tfutil.aws.attributes.VpnGatewayAttributes;
@@ -22,6 +23,7 @@ import com.jakub.tfutil.aws.attributes.VpnGatewayAttributes;
 public class Model {
 	public HashMap<String, VpcAttributes> vpcs;
 	public HashMap<String, SubnetAttributes> subnets;
+	public HashMap<String, SubnetIdsAttributes> subnetIdss;
 	public HashMap<String, RouteAttributes> routes;
 	public HashMap<String, RouteTableAttributes> routeTables;
 	public HashMap<String, RouteTableAssociationAttributes> routeTableAssociations;
@@ -37,6 +39,7 @@ public class Model {
 	public Model() {
 		this.vpcs = new HashMap<>();
 		this.subnets = new HashMap<>();
+		this.subnetIdss = new HashMap<>();
 		this.routes = new HashMap<>();
 		this.routeTables = new HashMap<>();
 		this.routeTableAssociations = new HashMap<>();
@@ -89,14 +92,16 @@ public class Model {
 		return matchingAttributes;
 	}
 
+
 	public HashSet<String> findAvailabilityZonesInVpc(String vpcId){
 		HashSet<String> zones = new HashSet<String>();
-		for (String tfName : subnets.keySet()) {
-			SubnetAttributes attr = subnets.get(tfName);
+		for (String id : subnets.keySet()) {
+			SubnetAttributes attr = subnets.get(id);
 			if (vpcId.equals(attr.vpc_id)){
 				zones.add(attr.availability_zone);
 			}
 		}
+		
 		return zones;
 	}
 	
@@ -198,5 +203,16 @@ public class Model {
 		}
 		return matchingAttributes;
 	}
-		
+	
+	public HashMap<String, SubnetIdsAttributes> findSubnetIdssAttributesInVpc(String idVpc) {
+		HashMap<String, SubnetIdsAttributes> matchingAttributes = new HashMap<>();
+		for (String id : subnetIdss.keySet()) {
+			SubnetIdsAttributes attr = subnetIdss.get(id);
+			if (attr.vpc_id.equals(idVpc)){
+				matchingAttributes.put(id, attr);
+			}
+		}
+		return matchingAttributes;
+	}
+			
 }

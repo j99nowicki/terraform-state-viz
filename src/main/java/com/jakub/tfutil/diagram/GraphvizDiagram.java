@@ -12,6 +12,7 @@ import com.jakub.tfutil.aws.attributes.RouteAttributes;
 import com.jakub.tfutil.aws.attributes.RouteTableAssociationAttributes;
 import com.jakub.tfutil.aws.attributes.RouteTableAttributes;
 import com.jakub.tfutil.aws.attributes.SubnetAttributes;
+import com.jakub.tfutil.aws.attributes.SubnetIdsAttributes;
 import com.jakub.tfutil.aws.attributes.VpcAttributes;
 import com.jakub.tfutil.aws.attributes.VpcEndpointAttributes;
 import com.jakub.tfutil.aws.attributes.VpnGatewayAttributes;
@@ -39,7 +40,8 @@ public class GraphvizDiagram{
 
 		for (String idVpc : vpcs.keySet()) {
 			VpcAttributes vpc = vpcs.get(idVpc);
-			
+			System.out.println("vpc: " + idVpc);
+
 			HashSet<String> zones = model.findAvailabilityZonesInVpc(idVpc);
 //			zones.clear();
 //			zones.add("eu-west-1c");
@@ -111,9 +113,30 @@ public class GraphvizDiagram{
 			diagram.append(
 "        }\n");
 
+//Subnet IDs
+		HashMap<String, SubnetIdsAttributes> subnetIdss = model.findSubnetIdssAttributesInVpc(idVpc);
+		for (String idSubnetIds : subnetIdss.keySet()) {
+			SubnetIdsAttributes subnetIds = subnetIdss.get(idSubnetIds);
+			for (String subnetId : subnetIds.ids) {
+				System.out.println("vpc: " + idVpc + " subnetId: " + subnetId);
+				diagram.append(
+"        subgraph cluster_"+(c++)+" {\n"+
+"            node [style=filled];\n"+
+"            style=\"dashed, rounded\";\n"+
+"            color=green\n"+
+"            label = \"SubnetId: "+ subnetId+"\"\n"+
+"            \""+subnetId+"\" [label = \"{id: "+subnetId+"}\" shape = \"record\" ];\n"+
+"            }\n");
+			}
+		}
+			
+//Subnet IDs - end
+			
+
 //Zones
 			for (String zone : zones) {
 				allDisplayedZones.add(zone);
+				System.out.println("vpc: " + idVpc +" zone: " + zone);
 				diagram.append(
 "        subgraph cluster_"+(c++)+" {\n"+
 "            node [style=filled];\n"+
@@ -123,7 +146,6 @@ public class GraphvizDiagram{
 //Subnets		
 				HashMap<String, SubnetAttributes> subnets = model.findSubnetsAttributesInVpcInZone(idVpc, zone);
 				for (String idSubnet : subnets.keySet()) {
-					System.out.println("vpc: " + idVpc +" zone: " + zone + " subnet: " + idSubnet);
 					SubnetAttributes subnet = subnets.get(idSubnet);
 					diagram.append(
 "            subgraph cluster_"+(c++)+" {\n"+
@@ -134,11 +156,11 @@ public class GraphvizDiagram{
 
 //Instances
 					HashMap<String, InstanceAttributes> instances = model.findInstancesInSubnet(subnet.id);
-					System.out.println("vpc: " + idVpc +" zone: " + zone + " subnet: " + idSubnet + " instances: " + instances.size() );
+//					System.out.println("vpc: " + idVpc +" zone: " + zone + " subnet: " + idSubnet + " instances: " + instances.size() );
 
 					for (String idInstance : instances.keySet()) {
 						InstanceAttributes instance = instances.get(idInstance);
-						System.out.println("vpc: " + idVpc +" zone: " + zone + " subnet: " + idSubnet + " instance: " +idInstance );
+//						System.out.println("vpc: " + idVpc +" zone: " + zone + " subnet: " + idSubnet + " instance: " +idInstance );
 
 						diagram.append(
 "                subgraph cluster_"+(c++)+" {\n"+

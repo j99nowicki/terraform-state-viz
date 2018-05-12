@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -24,6 +25,7 @@ import com.jakub.tfutil.aws.attributes.RouteTableAttributes;
 import com.jakub.tfutil.aws.attributes.SecurityGroupAttributes;
 import com.jakub.tfutil.aws.attributes.SecurityGroupRuleAttributes;
 import com.jakub.tfutil.aws.attributes.SubnetAttributes;
+import com.jakub.tfutil.aws.attributes.SubnetIdsAttributes;
 import com.jakub.tfutil.aws.attributes.TfAttributes;
 import com.jakub.tfutil.aws.attributes.VpcAttributes;
 import com.jakub.tfutil.aws.attributes.VpcEndpointAttributes;
@@ -99,72 +101,67 @@ public class TerraformStateViz{
 			JsonObject primary = resource.getAsJsonObject("primary");
 			String id = getElementAsString(primary.get("id"));
 			JsonElement jsonElement = primary.get("attributes");
-			System.out.println("type: " + type + " id: " + id + " tfName: "+tfName);
+			//System.out.println("type: " + type + " id: " + id + " tfName: "+tfName);
 			String objectKey = id;
 			if ("aws_instance".equals(type)) {
 				TfAttributes tfAttr = gson.fromJson(jsonElement, InstanceAttributes.class);
 				tfAttr.tfName = tfName;
 				model.instances.put(objectKey, (InstanceAttributes) tfAttr);
-			}
-			if ("aws_vpc_endpoint".equals(type)) {
+			} else if ("aws_vpc_endpoint".equals(type)) {
 				TfAttributes tfAttr = gson.fromJson(jsonElement, VpcEndpointAttributes.class);
 				tfAttr.tfName = tfName;
 				model.vpcEndpoints.put(objectKey, (VpcEndpointAttributes) tfAttr);
-			}
-			if ("aws_security_group".equals(type)) {
+			} else if ("aws_security_group".equals(type)) {
 				TfAttributes tfAttr = gson.fromJson(jsonElement, SecurityGroupAttributes.class);
 				tfAttr.tfName = tfName;
 				model.securityGroups.put(objectKey, (SecurityGroupAttributes) tfAttr);
-			}
-			if ("aws_security_group_rule".equals(type)) {
+			} else if ("aws_security_group_rule".equals(type)) {
 				TfAttributes tfAttr = gson.fromJson(jsonElement, SecurityGroupRuleAttributes.class);
 				tfAttr.tfName = tfName;
 				model.securityGroupRules.put(objectKey, (SecurityGroupRuleAttributes) tfAttr);
-			}
-			if ("aws_vpn_gateway".equals(type)) {
+			} else if ("aws_vpn_gateway".equals(type)) {
 				TfAttributes tfAttr = gson.fromJson(jsonElement, VpnGatewayAttributes.class);
 				tfAttr.tfName = tfName;
 				model.vpnGateways.put(objectKey, (VpnGatewayAttributes) tfAttr);
-			}
-			if ("aws_eip".equals(type)) {
+			} else if ("aws_eip".equals(type)) {
 				TfAttributes tfAttr = gson.fromJson(jsonElement, EipAttributes.class);
 				tfAttr.tfName = tfName;
 				model.eips.put(objectKey, (EipAttributes) tfAttr);
-			}
-			if ("aws_internet_gateway".equals(type)) {
+			} else if ("aws_internet_gateway".equals(type)) {
 				TfAttributes tfAttr = gson.fromJson(jsonElement, InternetGatewayAttributes.class);
 				tfAttr.tfName = tfName;
 				model.internetGateways.put(objectKey, (InternetGatewayAttributes) tfAttr);
-			}
-			if ("aws_nat_gateway".equals(type)) {
+			} else if ("aws_nat_gateway".equals(type)) {
 				TfAttributes tfAttr = gson.fromJson(jsonElement, NatGatewayAttributes.class);
 				tfAttr.tfName = tfName;
 				model.natGateways.put(objectKey, (NatGatewayAttributes) tfAttr);
-			}
-			if ("aws_route".equals(type)) {
+			} else if ("aws_route".equals(type)) {
 				TfAttributes tfAttr = gson.fromJson(jsonElement, RouteAttributes.class);
 				tfAttr.tfName = tfName;
 				model.routes.put(objectKey, (RouteAttributes) tfAttr);
-			}
-			if ("aws_route_table".equals(type)) {
+			} else if ("aws_route_table".equals(type)) {
 				TfAttributes tfAttr = gson.fromJson(jsonElement, RouteTableAttributes.class);
 				tfAttr.tfName = tfName;
 				model.routeTables.put(objectKey, (RouteTableAttributes) tfAttr);
-			}
-			if ("aws_route_table_association".equals(type)) {
+			} else if ("aws_route_table_association".equals(type)) {
 				TfAttributes tfAttr = gson.fromJson(jsonElement, RouteTableAssociationAttributes.class);
 				tfAttr.tfName = tfName;
 				model.routeTableAssociations.put(objectKey, (RouteTableAssociationAttributes) tfAttr);
-			}
-			if ("aws_subnet".equals(type)) {
+			} else if ("aws_subnet".equals(type)) {
 				TfAttributes tfAttr = gson.fromJson(jsonElement, SubnetAttributes.class);
 				tfAttr.tfName = tfName;
 				model.subnets.put(objectKey, (SubnetAttributes) tfAttr);
-			}
-			if ("aws_vpc".equals(type)) {
+			} else if ("aws_subnet_ids".equals(type)) {
+				SubnetIdsAttributes tfAttr = gson.fromJson(jsonElement, SubnetIdsAttributes.class);
+				tfAttr.tfName = tfName;
+				tfAttr.parseIds(jsonElement.getAsJsonObject().entrySet());
+				model.subnetIdss.put(objectKey, tfAttr);
+			} else if ("aws_vpc".equals(type)) {
 				TfAttributes tfAttr = gson.fromJson(jsonElement, VpcAttributes.class);
 				tfAttr.tfName = tfName;
 				model.vpcs.put(objectKey, (VpcAttributes) tfAttr);
+			} else {
+				System.out.println("Unknown type: "+ type);
 			}
 		}
 	}
