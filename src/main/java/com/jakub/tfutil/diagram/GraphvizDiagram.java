@@ -134,8 +134,12 @@ public class GraphvizDiagram{
 
 //Instances
 					HashMap<String, InstanceAttributes> instances = model.findInstancesInSubnet(subnet.id);
+					System.out.println("vpc: " + idVpc +" zone: " + zone + " subnet: " + idSubnet + " instances: " + instances.size() );
+
 					for (String idInstance : instances.keySet()) {
 						InstanceAttributes instance = instances.get(idInstance);
+						System.out.println("vpc: " + idVpc +" zone: " + zone + " subnet: " + idSubnet + " instance: " +idInstance );
+
 						diagram.append(
 "                subgraph cluster_"+(c++)+" {\n"+
 "                    \"icon-"+instance.id+"\" [label=EC2 shape=rpromoter]\n"+
@@ -152,7 +156,6 @@ public class GraphvizDiagram{
 //Nat Gw
 					HashMap<String, NatGatewayAttributes> natGws = model.findNatGatewaysAttributesInSubnet(subnet.id);
 					for (String idNatGw : natGws.keySet()) {
-						System.out.println("vpc: " + idVpc +" zone: " + zone + " subnet: " + idSubnet + " natGw: " +idNatGw );
 						NatGatewayAttributes natGw = natGws.get(idNatGw);
 						displayedNatGws.put(idNatGw, natGw);
 						diagram.append(
@@ -188,7 +191,6 @@ public class GraphvizDiagram{
 
 				HashMap<String, RouteTableAttributes> routeTables = model.findRouteTablesAttributesInVpc(idVpc);
 				for (String idRouteTable : routeTables.keySet()) {
-					System.out.println("vpc: " + idVpc + " routeTables: " +idRouteTable + " c: " + c);
 					RouteTableAttributes routeTable = routeTables.get(idRouteTable);
 					diagram.append(
 "        subgraph cluster_"+(c++)+" {\n"+
