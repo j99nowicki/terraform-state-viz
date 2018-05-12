@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.gson.annotations.SerializedName;
 
-public class InternetGatewayAttributes{
+public class InternetGatewayAttributes extends TfAttributes{
 	public String id;
 	@SerializedName("tags.%")
 	public int tagsCount;

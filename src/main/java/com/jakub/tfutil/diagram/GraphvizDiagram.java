@@ -69,7 +69,7 @@ public class GraphvizDiagram{
 "                node [style=filled];\n"+
 "                color=red;\n"+
 "                style=\"filled,rounded\" label = \"Internet GW: "+ igw.tagsName+"\"\n"+
-"                \""+igw.id+"\" [label = \"{tfName: "+ idIgw+"|id: "+idIgw +"}\" shape = \"record\" ];\n"+
+"                \""+igw.id+"\" [label = \"{tfName: "+ igw.tfName+"|id: "+idIgw +"}\" shape = \"record\" ];\n"+
 "            }\n");
 			}
 //Igw - end
@@ -85,7 +85,7 @@ public class GraphvizDiagram{
 "                node [style=filled];\n"+
 "                color=royalblue1\n"+
 "                style=\"filled,rounded\" label = \"VPN GW: "+ vpnGw.tagsName+"\"\n"+
-"                \""+vpnGw.id+"\" [label = \"{tfName: "+ idVpnGw+"|id: "+idVpnGw+"|amazon side ASN: "+vpnGw.amazon_side_asn+"}\" shape = \"record\" ];\n"+
+"                \""+vpnGw.id+"\" [label = \"{tfName: "+ vpnGw.tfName+"|id: "+idVpnGw+"|amazon side ASN: "+vpnGw.amazon_side_asn+"}\" shape = \"record\" ];\n"+
 "            }\n");
 			}
 //Vpn Gw - end
@@ -101,7 +101,7 @@ public class GraphvizDiagram{
 "                node [style=filled];\n"+
 "                color=orchid1\n"+
 "                style=\"filled,rounded\" label = \"VPC Endpoint: "+ vpcEndpoint.vpc_endpoint_type+"\"\n"+
-"                \""+vpcEndpoint.id+"\" [label = \"{tfName: "+ idVpcEndpoint+"|id: "+idVpcEndpoint+"|service_name: "+vpcEndpoint.service_name+"}\" shape = \"record\" ];\n"+
+"                \""+vpcEndpoint.id+"\" [label = \"{tfName: "+ vpcEndpoint.tfName+"|id: "+idVpcEndpoint+"|service_name: "+vpcEndpoint.service_name+"}\" shape = \"record\" ];\n"+
 "            }\n");
 			}
 //Vpc Endpoints	- end
@@ -128,7 +128,7 @@ public class GraphvizDiagram{
 "                node [style=filled];\n"+
 "                color=green\n"+
 "                label = \"Subnet: "+ subnet.tagsName+"\"\n"+
-"                \""+subnet.id+"\" [label = \"{tfName: "+ idSubnet+"|id: "+idSubnet+"|cidr_block: "+subnet.cidr_block+"}\" shape = \"record\" ];\n");
+"                \""+subnet.id+"\" [label = \"{tfName: "+ subnet.tfName+"|id: "+idSubnet+"|cidr_block: "+subnet.cidr_block+"}\" shape = \"record\" ];\n");
 
 //Instances
 					HashMap<String, InstanceAttributes> instances = model.findInstancesInSubnet(subnet.id);
@@ -140,7 +140,7 @@ public class GraphvizDiagram{
 "                    node [style=filled];\n"+
 "                    color=blue\n"+
 "                    label = \"EC2: "+ subnet.tagsName+"\"\n"+
-"                    \""+instance.id+"\" [label = \"{tfName: "+ idInstance+"|id: "+idInstance+"|public IP: "+instance.public_ip+"|private IP: "+instance.private_ip+"}\" shape = \"record\" ];\n");
+"                    \""+instance.id+"\" [label = \"{tfName: "+ instance.tfName+"|id: "+idInstance+"|public IP: "+instance.public_ip+"|private IP: "+instance.private_ip+"}\" shape = \"record\" ];\n");
 //Instances - end
 						diagram.append(					
 "                }\n");
@@ -157,7 +157,7 @@ public class GraphvizDiagram{
 "                    node [style=filled];\n"+
 "                    color=salmon\n"+
 "                    label = \"Nat GW: "+ subnet.tagsName+"\"\n"+
-"                    \""+natGw.id+"\" [label = \"{tfName: "+ idNatGw+"|id: "+idNatGw+"|public IP: "+natGw.public_ip+"|private IP: "+natGw.private_ip+"}\" shape = \"record\" ];\n");
+"                    \""+natGw.id+"\" [label = \"{tfName: "+ natGw.tfName+"|id: "+idNatGw+"|public IP: "+natGw.public_ip+"|private IP: "+natGw.private_ip+"}\" shape = \"record\" ];\n");
 
 //Eip
 						EipAttributes eipAttributes = model.findEipAttributes(natGw.allocation_id);
@@ -189,7 +189,7 @@ public class GraphvizDiagram{
 "            node [style=filled];\n"+
 "            color=mistyrose\n"+
 "            label = \"Route Table: "+ routeTable.tagsName+"\"\n"+
-"            \""+routeTable.id+"\" [label = \"{tfName: "+ idRouteTable+"|id: "+idRouteTable+"}\" shape = \"record\" ];\n"+
+"            \""+routeTable.id+"\" [label = \"{tfName: "+ routeTable.tfName+"|id: "+idRouteTable+"}\" shape = \"record\" ];\n"+
 "        }\n");
 				}
 			}	

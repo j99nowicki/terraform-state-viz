@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.gson.annotations.SerializedName;
 
-public class RouteTableAttributes {
+public class RouteTableAttributes extends TfAttributes{
 
 	public String destination_cidr_block;
 	public String id;

@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.gson.annotations.SerializedName;
 
-public class EipAttributes {
+public class EipAttributes extends TfAttributes{
 
 	public String association_id;
 	public String domain;

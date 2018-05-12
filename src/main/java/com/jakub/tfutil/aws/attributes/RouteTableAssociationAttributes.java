@@ -2,7 +2,7 @@ package com.jakub.tfutil.aws.attributes;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public class RouteTableAssociationAttributes {
+public class RouteTableAssociationAttributes extends TfAttributes{
 
 	public String route_table_id;
 	public String id;

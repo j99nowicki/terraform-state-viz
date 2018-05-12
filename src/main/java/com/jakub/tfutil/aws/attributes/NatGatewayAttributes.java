@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.gson.annotations.SerializedName;
 
-public class NatGatewayAttributes {
+public class NatGatewayAttributes extends TfAttributes{
 	public String id;
 	public String allocation_id;
 	public String network_interface_id;

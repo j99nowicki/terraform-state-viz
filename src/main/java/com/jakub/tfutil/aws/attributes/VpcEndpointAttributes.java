@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.gson.annotations.SerializedName;
 
-public class VpcEndpointAttributes {
+public class VpcEndpointAttributes extends TfAttributes{
 
 	@SerializedName("cidr_blocks.#")
 	public String CidrBlocksCount;

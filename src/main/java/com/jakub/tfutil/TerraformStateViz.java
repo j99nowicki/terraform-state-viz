@@ -102,40 +102,64 @@ public class TerraformStateViz{
 			System.out.println("type: " + type + " id: " + id + " tfName: "+tfName);
 			String objectKey = id;
 			if ("aws_instance".equals(type)) {
-				model.instances.put(objectKey, gson.fromJson(jsonElement, InstanceAttributes.class));
+				TfAttributes tfAttr = gson.fromJson(jsonElement, InstanceAttributes.class);
+				tfAttr.tfName = tfName;
+				model.instances.put(objectKey, (InstanceAttributes) tfAttr);
 			}
 			if ("aws_vpc_endpoint".equals(type)) {
-				model.vpcEndpoints.put(objectKey, gson.fromJson(jsonElement, VpcEndpointAttributes.class));
+				TfAttributes tfAttr = gson.fromJson(jsonElement, VpcEndpointAttributes.class);
+				tfAttr.tfName = tfName;
+				model.vpcEndpoints.put(objectKey, (VpcEndpointAttributes) tfAttr);
 			}
 			if ("aws_security_group".equals(type)) {
-				model.securityGroups.put(objectKey, gson.fromJson(jsonElement, SecurityGroupAttributes.class));
+				TfAttributes tfAttr = gson.fromJson(jsonElement, SecurityGroupAttributes.class);
+				tfAttr.tfName = tfName;
+				model.securityGroups.put(objectKey, (SecurityGroupAttributes) tfAttr);
 			}
 			if ("aws_security_group_rule".equals(type)) {
-				model.securityGroupRules.put(objectKey, gson.fromJson(jsonElement, SecurityGroupRuleAttributes.class));
+				TfAttributes tfAttr = gson.fromJson(jsonElement, SecurityGroupRuleAttributes.class);
+				tfAttr.tfName = tfName;
+				model.securityGroupRules.put(objectKey, (SecurityGroupRuleAttributes) tfAttr);
 			}
 			if ("aws_vpn_gateway".equals(type)) {
-				model.vpnGateways.put(objectKey, gson.fromJson(jsonElement, VpnGatewayAttributes.class));
+				TfAttributes tfAttr = gson.fromJson(jsonElement, VpnGatewayAttributes.class);
+				tfAttr.tfName = tfName;
+				model.vpnGateways.put(objectKey, (VpnGatewayAttributes) tfAttr);
 			}
 			if ("aws_eip".equals(type)) {
-				model.eips.put(objectKey, gson.fromJson(jsonElement, EipAttributes.class));
+				TfAttributes tfAttr = gson.fromJson(jsonElement, EipAttributes.class);
+				tfAttr.tfName = tfName;
+				model.eips.put(objectKey, (EipAttributes) tfAttr);
 			}
 			if ("aws_internet_gateway".equals(type)) {
-				model.internetGateways.put(objectKey, gson.fromJson(jsonElement, InternetGatewayAttributes.class));
+				TfAttributes tfAttr = gson.fromJson(jsonElement, InternetGatewayAttributes.class);
+				tfAttr.tfName = tfName;
+				model.internetGateways.put(objectKey, (InternetGatewayAttributes) tfAttr);
 			}
 			if ("aws_nat_gateway".equals(type)) {
-				model.natGateways.put(objectKey, gson.fromJson(jsonElement, NatGatewayAttributes.class));
+				TfAttributes tfAttr = gson.fromJson(jsonElement, NatGatewayAttributes.class);
+				tfAttr.tfName = tfName;
+				model.natGateways.put(objectKey, (NatGatewayAttributes) tfAttr);
 			}
 			if ("aws_route".equals(type)) {
-				model.routes.put(objectKey, gson.fromJson(jsonElement, RouteAttributes.class));
+				TfAttributes tfAttr = gson.fromJson(jsonElement, RouteAttributes.class);
+				tfAttr.tfName = tfName;
+				model.routes.put(objectKey, (RouteAttributes) tfAttr);
 			}
 			if ("aws_route_table".equals(type)) {
-				model.routeTables.put(objectKey, gson.fromJson(jsonElement, RouteTableAttributes.class));
+				TfAttributes tfAttr = gson.fromJson(jsonElement, RouteTableAttributes.class);
+				tfAttr.tfName = tfName;
+				model.routeTables.put(objectKey, (RouteTableAttributes) tfAttr);
 			}
 			if ("aws_route_table_association".equals(type)) {
-				model.routeTableAssociations.put(objectKey, gson.fromJson(jsonElement, RouteTableAssociationAttributes.class));
+				TfAttributes tfAttr = gson.fromJson(jsonElement, RouteTableAssociationAttributes.class);
+				tfAttr.tfName = tfName;
+				model.routeTableAssociations.put(objectKey, (RouteTableAssociationAttributes) tfAttr);
 			}
 			if ("aws_subnet".equals(type)) {
-				model.subnets.put(objectKey, gson.fromJson(jsonElement, SubnetAttributes.class));
+				TfAttributes tfAttr = gson.fromJson(jsonElement, SubnetAttributes.class);
+				tfAttr.tfName = tfName;
+				model.subnets.put(objectKey, (SubnetAttributes) tfAttr);
 			}
 			if ("aws_vpc".equals(type)) {
 				TfAttributes tfAttr = gson.fromJson(jsonElement, VpcAttributes.class);

@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.gson.annotations.SerializedName;
 
-public class SecurityGroupAttributes {
+public class SecurityGroupAttributes extends TfAttributes{
 	public String arn;
 	public String description;
 	@SerializedName("egress.#")

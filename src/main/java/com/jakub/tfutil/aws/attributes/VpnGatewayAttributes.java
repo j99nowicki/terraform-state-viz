@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.gson.annotations.SerializedName;
 
-public class VpnGatewayAttributes {
+public class VpnGatewayAttributes extends TfAttributes{
 	public String vpc_id;
 	public String id;
 	public int amazon_side_asn;

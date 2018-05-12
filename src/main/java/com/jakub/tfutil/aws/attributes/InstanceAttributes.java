@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.gson.annotations.SerializedName;
 
-public class InstanceAttributes {
+public class InstanceAttributes extends TfAttributes{
 	public String ami;
 	public boolean associate_public_ip_address;
     public String availability_zone;

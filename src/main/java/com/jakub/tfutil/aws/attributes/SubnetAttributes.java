@@ -3,7 +3,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.gson.annotations.SerializedName;
 
-public class SubnetAttributes {
+public class SubnetAttributes extends TfAttributes{
 	public boolean assign_ipv6_address_on_creation;
 	public String availability_zone;
 	public String cidr_block;
