@@ -26,6 +26,7 @@ public class GraphvizDiagram{
 		HashMap<String, InternetGatewayAttributes> allDisplayedIgws = new HashMap<String, InternetGatewayAttributes>();
 		HashMap<String, VpnGatewayAttributes> allDisplayedVpnGws = new HashMap<String, VpnGatewayAttributes>();
 		HashMap<String, VpcEndpointAttributes> allDisplayedVpcEndpoints = new HashMap<String, VpcEndpointAttributes>();
+		HashMap<String, NatGatewayAttributes> displayedNatGws = new HashMap<String, NatGatewayAttributes>();
 		HashSet<String> allDisplayedZones = new HashSet<String>();
 
 //Diagram
@@ -41,7 +42,7 @@ public class GraphvizDiagram{
 			
 			HashSet<String> zones = model.findAvailabilityZonesInVpc(idVpc);
 //			zones.clear();
-//			zones.add("eu-west-1b");
+//			zones.add("eu-west-1c");
 			
 			diagram.append(				
 "    subgraph cluster_"+(c++)+" {\n"+
@@ -122,6 +123,7 @@ public class GraphvizDiagram{
 //Subnets		
 				HashMap<String, SubnetAttributes> subnets = model.findSubnetsAttributesInVpcInZone(idVpc, zone);
 				for (String idSubnet : subnets.keySet()) {
+					System.out.println("vpc: " + idVpc +" zone: " + zone + " subnet: " + idSubnet);
 					SubnetAttributes subnet = subnets.get(idSubnet);
 					diagram.append(
 "            subgraph cluster_"+(c++)+" {\n"+
@@ -150,7 +152,9 @@ public class GraphvizDiagram{
 //Nat Gw
 					HashMap<String, NatGatewayAttributes> natGws = model.findNatGatewaysAttributesInSubnet(subnet.id);
 					for (String idNatGw : natGws.keySet()) {
+						System.out.println("vpc: " + idVpc +" zone: " + zone + " subnet: " + idSubnet + " natGw: " +idNatGw );
 						NatGatewayAttributes natGw = natGws.get(idNatGw);
+						displayedNatGws.put(idNatGw, natGw);
 						diagram.append(
 "                subgraph cluster_"+(c++)+" {\n"+
 "                    \"icon-"+natGw.id+"\" [label=NatGW shape=rpromoter]\n"+
@@ -180,54 +184,54 @@ public class GraphvizDiagram{
 			}
 
 //Route tables
-			HashMap<String, RouteTableAttributes> routeTables = model.findRouteTablesAttributesInVpc(idVpc);
 			if (showRouteTables){
+
+				HashMap<String, RouteTableAttributes> routeTables = model.findRouteTablesAttributesInVpc(idVpc);
 				for (String idRouteTable : routeTables.keySet()) {
+					System.out.println("vpc: " + idVpc + " routeTables: " +idRouteTable + " c: " + c);
 					RouteTableAttributes routeTable = routeTables.get(idRouteTable);
 					diagram.append(
 "        subgraph cluster_"+(c++)+" {\n"+
 "            node [style=filled];\n"+
 "            color=mistyrose\n"+
 "            label = \"Route Table: "+ routeTable.tagsName+"\"\n"+
-"            \""+routeTable.id+"\" [label = \"{tfName: "+ routeTable.tfName+"|id: "+idRouteTable+"}\" shape = \"record\" ];\n"+
+"            \""+idRouteTable+"\" [label = \"{tfName: "+ routeTable.tfName+"|id: "+idRouteTable+"}\" shape = \"record\" ];\n"+
 "        }\n");
-				}
-			}	
-//Route tables - end		
 
-//TODO Separate RTA by VPC
-//Route table associations
-			HashMap<String, RouteTableAssociationAttributes> routeTableAssociations = model.routeTableAssociations;
-			for (String idRouteTableAssociation : routeTableAssociations.keySet()) {
-				RouteTableAssociationAttributes routeTableAssociation = routeTableAssociations.get(idRouteTableAssociation);
-				SubnetAttributes subnet = model.findSubnetAttributes(routeTableAssociation.subnet_id);
-				RouteTableAttributes routeTable = model.findRouteTableAttributes(routeTableAssociation.route_table_id);
-				
-				if (subnet!=null && routeTable!=null && zones.contains(subnet.availability_zone)){
-					if (showRouteTables){
-						diagram.append("        \""+subnet.id+"\" -> \""+ routeTable.id +"\" [label = \""+idRouteTableAssociation+"\" dir=none, style=dashed]\n");
-					}
+//Route table associations - find all associations for given table
+					HashMap<String, RouteTableAssociationAttributes> routeTableAssociations = model.findRouteTablesAssociationAttributesForRouteTables(idRouteTable);
+					
+					for (String idRouteTableAssociation : routeTableAssociations.keySet()) {
+						RouteTableAssociationAttributes routeTableAssociation = routeTableAssociations.get(idRouteTableAssociation);
+						SubnetAttributes subnet = model.findSubnetAttributes(routeTableAssociation.subnet_id);
+						
+						if (subnet!=null && routeTable!=null && zones.contains(subnet.availability_zone)){
+							if (showRouteTables){
+								diagram.append("        \""+subnet.id+"\" -> \""+ routeTable.id +"\" [label = \""+idRouteTableAssociation+"\" dir=none, style=dashed]\n");
+							}
 //Routes - find all routes belonging to the route table and connect it to the gateway
-					HashMap<String, RouteAttributes> matchingRoutes = model.findRoutesAttributesInTable(routeTable.id);
-					for (String idRoute : matchingRoutes.keySet()) {
-						String gatewayId = matchingRoutes.get(idRoute).gateway_id;		
-						String natGatewayId = matchingRoutes.get(idRoute).nat_gateway_id;
-						if (!"".equals(gatewayId) && gatewayId!=null){
-							diagram.append("        \""+subnet.id+"\" -> \""+ gatewayId +"\" [label = \""+idRouteTableAssociation+"\" dir=both]\n");						
-						} else if (!"".equals(natGatewayId) && natGatewayId!=null){
-							diagram.append("        \""+subnet.id+"\" -> \""+ natGatewayId +"\" [label = \""+idRouteTableAssociation+"\" ]\n");						
+							HashMap<String, RouteAttributes> matchingRoutes = model.findRoutesAttributesInTable(routeTable.id);
+							for (String idRoute : matchingRoutes.keySet()) {
+								String gatewayId = matchingRoutes.get(idRoute).gateway_id;		
+								String natGatewayId = matchingRoutes.get(idRoute).nat_gateway_id;
+								if (!"".equals(gatewayId) && gatewayId!=null){
+									diagram.append("        \""+subnet.id+"\" -> \""+ gatewayId +"\" [label = \""+idRouteTableAssociation+"\" dir=both]\n");						
+								} else if (!"".equals(natGatewayId) && natGatewayId!=null){
+									diagram.append("        \""+subnet.id+"\" -> \""+ natGatewayId +"\" [label = \""+idRouteTableAssociation+"\" ]\n");						
+								}
+							}				
+//Routes -end
 						}
 					}
-				
-//Routes -end
+//Route tables - end		
 				}
-			}
+			}	
 				
 //Route table associations - end
 			
 //Vpc - end
 			diagram.append(				
-"    }\n");	
+"    }\n");
 		}
 			
 //External
@@ -242,7 +246,7 @@ public class GraphvizDiagram{
 			diagram.append(
 "        \""+idIgw+"\" -> Internet [dir=both]\n");
 		}
-		HashMap<String, NatGatewayAttributes> displayedNatGws = model.findNatGatewaysAttributesInZones(allDisplayedZones);
+//		HashMap<String, NatGatewayAttributes> displayedNatGws = model.findNatGatewaysAttributesInZones(allDisplayedZones);
 		for (String idNatGw : displayedNatGws.keySet()) {
 //			NatGatewayAttributes natGw = displayedNatGws.get(idNatGw);
 			diagram.append(

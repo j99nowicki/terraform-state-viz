@@ -144,19 +144,6 @@ public class Model {
 		return null;
 	}
 	
-	public HashMap<String, NatGatewayAttributes> findNatGatewaysAttributesInZones(HashSet<String> zones){
-		HashMap<String, NatGatewayAttributes> matchingAttributes = new HashMap<>();
-		HashMap<String, NatGatewayAttributes> allNatGatewaysAttributes = new HashMap<>();
-		for (String id : allNatGatewaysAttributes.keySet()) {
-			NatGatewayAttributes natGatewayAttributes = natGateways.get(id);
-			SubnetAttributes subnetAttributes = findSubnetAttributes(natGatewayAttributes.subnet_id);
-			if (zones.contains(subnetAttributes.availability_zone)){
-				matchingAttributes.put(id, natGatewayAttributes);
-			}
-		}
-		return matchingAttributes;
-	}
-	
 	public HashMap<String, InternetGatewayAttributes> findInternetGatewaysAttributesInVpc(String idVpc) {
 		HashMap<String, InternetGatewayAttributes> matchingAttributes = new HashMap<>();
 		for (String id : internetGateways.keySet()) {
@@ -200,5 +187,16 @@ public class Model {
 		}
 		return matchingAttributes;
 	}
-	
+
+	public HashMap<String, RouteTableAssociationAttributes> findRouteTablesAssociationAttributesForRouteTables(String idRouteTable) {
+		HashMap<String, RouteTableAssociationAttributes> matchingAttributes = new HashMap<>();
+		for (String id : routeTableAssociations.keySet()) {
+			RouteTableAssociationAttributes attr = routeTableAssociations.get(id);
+			if (attr.route_table_id.equals(idRouteTable)){
+				matchingAttributes.put(id, attr);
+			}
+		}
+		return matchingAttributes;
+	}
+		
 }

@@ -99,7 +99,7 @@ public class TerraformStateViz{
 			JsonObject primary = resource.getAsJsonObject("primary");
 			String id = getElementAsString(primary.get("id"));
 			JsonElement jsonElement = primary.get("attributes");
-			System.out.println("type: " + type + " id: " + id + " tfName: "+tfName);
+			//System.out.println("type: " + type + " id: " + id + " tfName: "+tfName);
 			String objectKey = id;
 			if ("aws_instance".equals(type)) {
 				TfAttributes tfAttr = gson.fromJson(jsonElement, InstanceAttributes.class);
