@@ -98,7 +98,7 @@ public class Model {
 	}
 
 
-	public HashSet<String> findAvailabilityZonesInVpc(String vpcId){
+	public HashSet<String> findAvailabilityZonesInRVpc(String vpcId){
 		HashSet<String> zones = new HashSet<String>();
 		for (String id : rSubnets.keySet()) {
 			ResourceSubnet attr = rSubnets.get(id);
@@ -106,7 +106,19 @@ public class Model {
 				zones.add(attr.availability_zone);
 			}
 		}
-		
+		return zones;
+	}
+
+	public HashSet<String> findAvailabilityZonesForInstancesInDVpc(DataSubnetIds dSubnetIds){
+		HashSet<String> zones = new HashSet<String>();
+		for (String idDSubnet : dSubnetIds.ids) {
+			for (String idInstance : rInstances.keySet()) {
+				ResourceInstance attr = rInstances.get(idInstance);
+				if (idDSubnet.equals(attr.subnet_id)){
+					zones.add(attr.availability_zone);
+				}
+			}			
+		}
 		return zones;
 	}
 	
@@ -132,11 +144,11 @@ public class Model {
 		return matchingAttributes;
 	}
 	
-	public HashMap<String, ResourceInstance> findInstancesInSubnet(String idSubnte){
+	public HashMap<String, ResourceInstance> findInstancesInSubnet(String idSubnet){
 		HashMap<String, ResourceInstance> matchingAttributes = new HashMap<>();
 		for (String id : rInstances.keySet()) {
 			ResourceInstance attr = rInstances.get(id);
-			if (attr.subnet_id.equals(idSubnte)){
+			if (attr.subnet_id.equals(idSubnet)){
 				matchingAttributes.put(id, attr);
 			}
 		}

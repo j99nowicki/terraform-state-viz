@@ -54,9 +54,8 @@ public class TerraformStateViz{
 //        JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraform_ireland.tfstate");
                 
         Model model = terraformRcsViz.buildModel(stateJson);
-		//System.out.println(model);
-		GraphvizDiagram graphvizDiagram = new GraphvizDiagram();
-		String diagram = graphvizDiagram.draw(model);
+		GraphvizDiagram graphvizDiagram = new GraphvizDiagram(model);
+		String diagram = graphvizDiagram.draw();
 		System.out.println(diagram);
 		
 	}
