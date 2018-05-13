@@ -1,4 +1,4 @@
-package com.jakub.tfutil.aws.attributes;
+package com.jakub.tfutil.aws;
 
 public abstract class TfAttributes {
 	public String tfName = "";

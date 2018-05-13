@@ -1,10 +1,10 @@
-package com.jakub.tfutil.aws.attributes;
+package com.jakub.tfutil.aws.resources;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.gson.annotations.SerializedName;
 
-public class VpcAttributes extends TfAttributes{
+public class ResourceVpc extends TfResource{
 	public boolean assign_generated_ipv6_cidr_block;
 	public String cidr_block;
 	public String default_network_acl_id;

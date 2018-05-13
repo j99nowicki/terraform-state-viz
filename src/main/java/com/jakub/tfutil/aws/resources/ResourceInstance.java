@@ -1,10 +1,10 @@
-package com.jakub.tfutil.aws.attributes;
+package com.jakub.tfutil.aws.resources;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.gson.annotations.SerializedName;
 
-public class InstanceAttributes extends TfAttributes{
+public class ResourceInstance extends TfResource{
 	public String ami;
 	public boolean associate_public_ip_address;
     public String availability_zone;

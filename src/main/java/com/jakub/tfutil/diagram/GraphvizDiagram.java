@@ -4,18 +4,18 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import com.jakub.tfutil.Model;
-import com.jakub.tfutil.aws.attributes.EipAttributes;
-import com.jakub.tfutil.aws.attributes.InstanceAttributes;
-import com.jakub.tfutil.aws.attributes.InternetGatewayAttributes;
-import com.jakub.tfutil.aws.attributes.NatGatewayAttributes;
-import com.jakub.tfutil.aws.attributes.RouteAttributes;
-import com.jakub.tfutil.aws.attributes.RouteTableAssociationAttributes;
-import com.jakub.tfutil.aws.attributes.RouteTableAttributes;
-import com.jakub.tfutil.aws.attributes.SubnetAttributes;
-import com.jakub.tfutil.aws.attributes.SubnetIdsAttributes;
-import com.jakub.tfutil.aws.attributes.VpcAttributes;
-import com.jakub.tfutil.aws.attributes.VpcEndpointAttributes;
-import com.jakub.tfutil.aws.attributes.VpnGatewayAttributes;
+import com.jakub.tfutil.aws.data.DataSubnetIds;
+import com.jakub.tfutil.aws.resources.ResourceEip;
+import com.jakub.tfutil.aws.resources.ResourceInstance;
+import com.jakub.tfutil.aws.resources.ResourceInternetGateway;
+import com.jakub.tfutil.aws.resources.ResourceNatGateway;
+import com.jakub.tfutil.aws.resources.ResourceRoute;
+import com.jakub.tfutil.aws.resources.ResourceRouteTableAssociation;
+import com.jakub.tfutil.aws.resources.ResourceRouteTable;
+import com.jakub.tfutil.aws.resources.ResourceSubnet;
+import com.jakub.tfutil.aws.resources.ResourceVpc;
+import com.jakub.tfutil.aws.resources.ResourceVpcEndpoint;
+import com.jakub.tfutil.aws.resources.ResourceVpnGateway;
 
 public class GraphvizDiagram{
 		
@@ -24,10 +24,10 @@ public class GraphvizDiagram{
 		
 		StringBuffer diagram = new StringBuffer();
 		int c=0;
-		HashMap<String, InternetGatewayAttributes> allDisplayedIgws = new HashMap<String, InternetGatewayAttributes>();
-		HashMap<String, VpnGatewayAttributes> allDisplayedVpnGws = new HashMap<String, VpnGatewayAttributes>();
-		HashMap<String, VpcEndpointAttributes> allDisplayedVpcEndpoints = new HashMap<String, VpcEndpointAttributes>();
-		HashMap<String, NatGatewayAttributes> displayedNatGws = new HashMap<String, NatGatewayAttributes>();
+		HashMap<String, ResourceInternetGateway> allDisplayedIgws = new HashMap<String, ResourceInternetGateway>();
+		HashMap<String, ResourceVpnGateway> allDisplayedVpnGws = new HashMap<String, ResourceVpnGateway>();
+		HashMap<String, ResourceVpcEndpoint> allDisplayedVpcEndpoints = new HashMap<String, ResourceVpcEndpoint>();
+		HashMap<String, ResourceNatGateway> displayedNatGws = new HashMap<String, ResourceNatGateway>();
 		HashSet<String> allDisplayedZones = new HashSet<String>();
 
 //Diagram
@@ -36,10 +36,10 @@ public class GraphvizDiagram{
 "    rankdir=TB;\n");
 		
 //Vpc
-		HashMap<String, VpcAttributes> vpcs = model.vpcs;
+		HashMap<String, ResourceVpc> vpcs = model.vpcs;
 
 		for (String idVpc : vpcs.keySet()) {
-			VpcAttributes vpc = vpcs.get(idVpc);
+			ResourceVpc vpc = vpcs.get(idVpc);
 			System.out.println("vpc: " + idVpc);
 
 			HashSet<String> zones = model.findAvailabilityZonesInVpc(idVpc);
@@ -62,9 +62,9 @@ public class GraphvizDiagram{
 "            label=Gateways\n");
 		
 //Igw
-			HashMap<String, InternetGatewayAttributes> igws = model.findInternetGatewaysAttributesInVpc(idVpc);
+			HashMap<String, ResourceInternetGateway> igws = model.findInternetGatewaysAttributesInVpc(idVpc);
 			for (String idIgw : igws.keySet()) {
-				InternetGatewayAttributes igw = igws.get(idIgw);
+				ResourceInternetGateway igw = igws.get(idIgw);
 				allDisplayedIgws.put(idIgw, igw);
 				diagram.append(
 "            subgraph cluster_"+(c++)+" {\n"+
@@ -78,9 +78,9 @@ public class GraphvizDiagram{
 //Igw - end
 
 //Vpn Gw
-			HashMap<String, VpnGatewayAttributes> vpnGws = model.findVpnGatewaysAttributesInVpc(idVpc);
+			HashMap<String, ResourceVpnGateway> vpnGws = model.findVpnGatewaysAttributesInVpc(idVpc);
 			for (String idVpnGw : vpnGws.keySet()) {
-				VpnGatewayAttributes vpnGw = vpnGws.get(idVpnGw);
+				ResourceVpnGateway vpnGw = vpnGws.get(idVpnGw);
 				allDisplayedVpnGws.put(idVpnGw, vpnGw);
 				diagram.append(
 "            subgraph cluster_"+(c++)+" {\n"+
@@ -94,9 +94,9 @@ public class GraphvizDiagram{
 //Vpn Gw - end
 		
 //Vpc Endpoints			
-			HashMap<String, VpcEndpointAttributes> vpcEndpoints = model.findVpcEndpointAttributesInVpc(idVpc);
+			HashMap<String, ResourceVpcEndpoint> vpcEndpoints = model.findVpcEndpointAttributesInVpc(idVpc);
 			for (String idVpcEndpoint : vpcEndpoints.keySet()) {
-				VpcEndpointAttributes vpcEndpoint = vpcEndpoints.get(idVpcEndpoint);
+				ResourceVpcEndpoint vpcEndpoint = vpcEndpoints.get(idVpcEndpoint);
 				allDisplayedVpcEndpoints.put(idVpcEndpoint, vpcEndpoint);
 				diagram.append(
 "            subgraph cluster_"+(c++)+" {\n"+
@@ -114,9 +114,9 @@ public class GraphvizDiagram{
 "        }\n");
 
 //Subnet IDs
-		HashMap<String, SubnetIdsAttributes> subnetIdss = model.findSubnetIdssAttributesInVpc(idVpc);
+		HashMap<String, DataSubnetIds> subnetIdss = model.findSubnetIdssAttributesInVpc(idVpc);
 		for (String idSubnetIds : subnetIdss.keySet()) {
-			SubnetIdsAttributes subnetIds = subnetIdss.get(idSubnetIds);
+			DataSubnetIds subnetIds = subnetIdss.get(idSubnetIds);
 			for (String subnetId : subnetIds.ids) {
 				System.out.println("vpc: " + idVpc + " subnetId: " + subnetId);
 				diagram.append(
@@ -144,9 +144,9 @@ public class GraphvizDiagram{
 "            label = \"Availability zone: "+ zone +"\"\n");
 		
 //Subnets		
-				HashMap<String, SubnetAttributes> subnets = model.findSubnetsAttributesInVpcInZone(idVpc, zone);
+				HashMap<String, ResourceSubnet> subnets = model.findSubnetsAttributesInVpcInZone(idVpc, zone);
 				for (String idSubnet : subnets.keySet()) {
-					SubnetAttributes subnet = subnets.get(idSubnet);
+					ResourceSubnet subnet = subnets.get(idSubnet);
 					diagram.append(
 "            subgraph cluster_"+(c++)+" {\n"+
 "                node [style=filled];\n"+
@@ -155,11 +155,11 @@ public class GraphvizDiagram{
 "                \""+subnet.id+"\" [label = \"{tfName: "+ subnet.tfName+"|id: "+idSubnet+"|cidr_block: "+subnet.cidr_block+"}\" shape = \"record\" ];\n");
 
 //Instances
-					HashMap<String, InstanceAttributes> instances = model.findInstancesInSubnet(subnet.id);
+					HashMap<String, ResourceInstance> instances = model.findInstancesInSubnet(subnet.id);
 //					System.out.println("vpc: " + idVpc +" zone: " + zone + " subnet: " + idSubnet + " instances: " + instances.size() );
 
 					for (String idInstance : instances.keySet()) {
-						InstanceAttributes instance = instances.get(idInstance);
+						ResourceInstance instance = instances.get(idInstance);
 //						System.out.println("vpc: " + idVpc +" zone: " + zone + " subnet: " + idSubnet + " instance: " +idInstance );
 
 						diagram.append(
@@ -176,9 +176,9 @@ public class GraphvizDiagram{
 //Nat - end
 				
 //Nat Gw
-					HashMap<String, NatGatewayAttributes> natGws = model.findNatGatewaysAttributesInSubnet(subnet.id);
+					HashMap<String, ResourceNatGateway> natGws = model.findNatGatewaysAttributesInSubnet(subnet.id);
 					for (String idNatGw : natGws.keySet()) {
-						NatGatewayAttributes natGw = natGws.get(idNatGw);
+						ResourceNatGateway natGw = natGws.get(idNatGw);
 						displayedNatGws.put(idNatGw, natGw);
 						diagram.append(
 "                subgraph cluster_"+(c++)+" {\n"+
@@ -189,7 +189,7 @@ public class GraphvizDiagram{
 "                    \""+natGw.id+"\" [label = \"{tfName: "+ natGw.tfName+"|id: "+idNatGw+"|public IP: "+natGw.public_ip+"|private IP: "+natGw.private_ip+"}\" shape = \"record\" ];\n");
 
 //Eip
-						EipAttributes eipAttributes = model.findEipAttributes(natGw.allocation_id);
+						ResourceEip eipAttributes = model.findEipAttributes(natGw.allocation_id);
 						diagram.append(			
 "                    \"icon-"+eipAttributes.id+"\" [label=\"Elastic IP\" shape=house color=yellow]\n");
 //Eip - end
@@ -211,9 +211,9 @@ public class GraphvizDiagram{
 //Route tables
 			if (showRouteTables){
 
-				HashMap<String, RouteTableAttributes> routeTables = model.findRouteTablesAttributesInVpc(idVpc);
+				HashMap<String, ResourceRouteTable> routeTables = model.findRouteTablesAttributesInVpc(idVpc);
 				for (String idRouteTable : routeTables.keySet()) {
-					RouteTableAttributes routeTable = routeTables.get(idRouteTable);
+					ResourceRouteTable routeTable = routeTables.get(idRouteTable);
 					diagram.append(
 "        subgraph cluster_"+(c++)+" {\n"+
 "            node [style=filled];\n"+
@@ -223,18 +223,18 @@ public class GraphvizDiagram{
 "        }\n");
 
 //Route table associations - find all associations for given table
-					HashMap<String, RouteTableAssociationAttributes> routeTableAssociations = model.findRouteTablesAssociationAttributesForRouteTables(idRouteTable);
+					HashMap<String, ResourceRouteTableAssociation> routeTableAssociations = model.findRouteTablesAssociationAttributesForRouteTables(idRouteTable);
 					
 					for (String idRouteTableAssociation : routeTableAssociations.keySet()) {
-						RouteTableAssociationAttributes routeTableAssociation = routeTableAssociations.get(idRouteTableAssociation);
-						SubnetAttributes subnet = model.findSubnetAttributes(routeTableAssociation.subnet_id);
+						ResourceRouteTableAssociation routeTableAssociation = routeTableAssociations.get(idRouteTableAssociation);
+						ResourceSubnet subnet = model.findSubnetAttributes(routeTableAssociation.subnet_id);
 						
 						if (subnet!=null && routeTable!=null && zones.contains(subnet.availability_zone)){
 							if (showRouteTables){
 								diagram.append("        \""+subnet.id+"\" -> \""+ routeTable.id +"\" [label = \""+idRouteTableAssociation+"\" dir=none, style=dashed]\n");
 							}
 //Routes - find all routes belonging to the route table and connect it to the gateway
-							HashMap<String, RouteAttributes> matchingRoutes = model.findRoutesAttributesInTable(routeTable.id);
+							HashMap<String, ResourceRoute> matchingRoutes = model.findRoutesAttributesInTable(routeTable.id);
 							for (String idRoute : matchingRoutes.keySet()) {
 								String gatewayId = matchingRoutes.get(idRoute).gateway_id;		
 								String natGatewayId = matchingRoutes.get(idRoute).nat_gateway_id;
@@ -288,7 +288,7 @@ public class GraphvizDiagram{
 		
 //Endpoints
 		for (String idVpcEndpoint : allDisplayedVpcEndpoints.keySet()) {
-			VpcEndpointAttributes vpcEndpoint = model.vpcEndpoints.get(idVpcEndpoint);
+			ResourceVpcEndpoint vpcEndpoint = model.vpcEndpoints.get(idVpcEndpoint);
 			diagram.append(
 "        \""+idVpcEndpoint+"\" -> \"AWS "+vpcEndpoint.service_name+"\" \n");
 		}		

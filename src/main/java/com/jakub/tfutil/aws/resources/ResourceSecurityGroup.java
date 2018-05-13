@@ -1,10 +1,10 @@
-package com.jakub.tfutil.aws.attributes;
+package com.jakub.tfutil.aws.resources;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.gson.annotations.SerializedName;
 
-public class SecurityGroupAttributes extends TfAttributes{
+public class ResourceSecurityGroup extends TfResource{
 	public String arn;
 	public String description;
 	@SerializedName("egress.#")

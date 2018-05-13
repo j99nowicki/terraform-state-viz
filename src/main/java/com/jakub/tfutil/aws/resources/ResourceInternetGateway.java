@@ -1,20 +1,16 @@
-package com.jakub.tfutil.aws.attributes;
+package com.jakub.tfutil.aws.resources;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.google.gson.annotations.SerializedName;
 
-public class NatGatewayAttributes extends TfAttributes{
+public class ResourceInternetGateway extends TfResource{
 	public String id;
-	public String allocation_id;
-	public String network_interface_id;
-	public String private_ip;
-	public String public_ip;
-	public String subnet_id;
 	@SerializedName("tags.%")
 	public int tagsCount;
 	@SerializedName("tags.Name")
 	public String tagsName;
+	public String vpc_id;
 	
 	@Override
 	public String toString()
