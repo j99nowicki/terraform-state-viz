@@ -6,6 +6,7 @@ import java.util.HashSet;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.jakub.tfutil.aws.data.DataSubnetIds;
+import com.jakub.tfutil.aws.data.DataVpc;
 import com.jakub.tfutil.aws.resources.ResourceEip;
 import com.jakub.tfutil.aws.resources.ResourceInstance;
 import com.jakub.tfutil.aws.resources.ResourceInternetGateway;
@@ -21,36 +22,40 @@ import com.jakub.tfutil.aws.resources.ResourceVpcEndpoint;
 import com.jakub.tfutil.aws.resources.ResourceVpnGateway;
 
 public class Model {
-	public HashMap<String, ResourceVpc> vpcs;
-	public HashMap<String, ResourceSubnet> subnets;
-	public HashMap<String, DataSubnetIds> subnetIdss;
-	public HashMap<String, ResourceRoute> routes;
-	public HashMap<String, ResourceRouteTable> routeTables;
-	public HashMap<String, ResourceRouteTableAssociation> routeTableAssociations;
-	public HashMap<String, ResourceInternetGateway> internetGateways;
-	public HashMap<String, ResourceNatGateway> natGateways;
-	public HashMap<String, ResourceEip> eips;
-	public HashMap<String, ResourceVpnGateway> vpnGateways;
-	public HashMap<String, ResourceVpcEndpoint> vpcEndpoints;
-	public HashMap<String, ResourceSecurityGroup> securityGroups;
-	public HashMap<String, ResourceSecurityGroupRule> securityGroupRules;
-	public HashMap<String, ResourceInstance> instances;
-	
+	public HashMap<String, ResourceVpc> rVpcs;
+	public HashMap<String, ResourceSubnet> rSubnets;
+	public HashMap<String, ResourceRoute> rRoutes;
+	public HashMap<String, ResourceRouteTable> rRouteTables;
+	public HashMap<String, ResourceRouteTableAssociation> rRouteTableAssociations;
+	public HashMap<String, ResourceInternetGateway> rInternetGateways;
+	public HashMap<String, ResourceNatGateway> rNatGateways;
+	public HashMap<String, ResourceEip> rEips;
+	public HashMap<String, ResourceVpnGateway> rVpnGateways;
+	public HashMap<String, ResourceVpcEndpoint> rVpcEndpoints;
+	public HashMap<String, ResourceSecurityGroup> rSecurityGroups;
+	public HashMap<String, ResourceSecurityGroupRule> rSecurityGroupRules;
+	public HashMap<String, ResourceInstance> rInstances;
+
+	public HashMap<String, DataSubnetIds> dSubnetIdss;
+	public HashMap<String, DataVpc> dVpcs;
+
 	public Model() {
-		this.vpcs = new HashMap<>();
-		this.subnets = new HashMap<>();
-		this.subnetIdss = new HashMap<>();
-		this.routes = new HashMap<>();
-		this.routeTables = new HashMap<>();
-		this.routeTableAssociations = new HashMap<>();
-		this.internetGateways = new HashMap<>();
-		this.natGateways = new HashMap<>();
-		this.eips = new HashMap<>();
-		this.vpnGateways = new HashMap<>();
-		this.vpcEndpoints = new HashMap<>();
-		this.securityGroups = new HashMap<>();
-		this.securityGroupRules = new HashMap<>();
-		this.instances = new HashMap<>();
+		this.rVpcs = new HashMap<>();
+		this.rSubnets = new HashMap<>();
+		this.rRoutes = new HashMap<>();
+		this.rRouteTables = new HashMap<>();
+		this.rRouteTableAssociations = new HashMap<>();
+		this.rInternetGateways = new HashMap<>();
+		this.rNatGateways = new HashMap<>();
+		this.rEips = new HashMap<>();
+		this.rVpnGateways = new HashMap<>();
+		this.rVpcEndpoints = new HashMap<>();
+		this.rSecurityGroups = new HashMap<>();
+		this.rSecurityGroupRules = new HashMap<>();
+		this.rInstances = new HashMap<>();
+
+		this.dSubnetIdss = new HashMap<>();
+		this.dVpcs = new HashMap<>();
 	}
 	@Override
 	public String toString()
@@ -63,28 +68,28 @@ public class Model {
 	}
 	
 	public ResourceSubnet findSubnetAttributes(String idSubnet){
-		for (String id : subnets.keySet()) {
-			ResourceSubnet attr = subnets.get(id);
+		for (String id : rSubnets.keySet()) {
+			ResourceSubnet attr = rSubnets.get(id);
 			if (attr.id.equals(idSubnet)){
-				return subnets.get(id);
+				return rSubnets.get(id);
 			}
 		}
 		return null;
 	}
 	
 	public ResourceRouteTable findRouteTableAttributes(String idRouteTable){
-		for (String id : routeTables.keySet()) {
-			ResourceRouteTable attr = routeTables.get(id);
+		for (String id : rRouteTables.keySet()) {
+			ResourceRouteTable attr = rRouteTables.get(id);
 			if (attr.id.equals(idRouteTable)){
-				return routeTables.get(id);
+				return rRouteTables.get(id);
 			}
 		}
 		return null;
 	}
 	public HashMap<String, ResourceRoute> findRoutesAttributesInTable(String idRouteTable){
 		HashMap<String, ResourceRoute> matchingAttributes = new HashMap<>();
-		for (String id : routes.keySet()) {
-			ResourceRoute attr = routes.get(id);
+		for (String id : rRoutes.keySet()) {
+			ResourceRoute attr = rRoutes.get(id);
 			if (attr.route_table_id.equals(idRouteTable)){
 				matchingAttributes.put(attr.id, attr);
 			}
@@ -95,8 +100,8 @@ public class Model {
 
 	public HashSet<String> findAvailabilityZonesInVpc(String vpcId){
 		HashSet<String> zones = new HashSet<String>();
-		for (String id : subnets.keySet()) {
-			ResourceSubnet attr = subnets.get(id);
+		for (String id : rSubnets.keySet()) {
+			ResourceSubnet attr = rSubnets.get(id);
 			if (vpcId.equals(attr.vpc_id)){
 				zones.add(attr.availability_zone);
 			}
@@ -107,8 +112,8 @@ public class Model {
 	
 	public HashMap<String, ResourceSubnet> findSubnetsAttributesInVpcInZone(String idVpc, String zone){
 		HashMap<String, ResourceSubnet> matchingAttributes = new HashMap<>();
-		for (String id : subnets.keySet()) {
-			ResourceSubnet attr = subnets.get(id);
+		for (String id : rSubnets.keySet()) {
+			ResourceSubnet attr = rSubnets.get(id);
 			if (attr.vpc_id.equals(idVpc) && attr.availability_zone.equals(zone)){
 				matchingAttributes.put(id, attr);
 			}
@@ -118,8 +123,8 @@ public class Model {
 	
 	public HashMap<String, ResourceNatGateway> findNatGatewaysAttributesInSubnet(String idSubnet){
 		HashMap<String, ResourceNatGateway> matchingAttributes = new HashMap<>();
-		for (String id : natGateways.keySet()) {
-			ResourceNatGateway attr = natGateways.get(id);
+		for (String id : rNatGateways.keySet()) {
+			ResourceNatGateway attr = rNatGateways.get(id);
 			if (attr.subnet_id.equals(idSubnet)){
 				matchingAttributes.put(id, attr);
 			}
@@ -129,8 +134,8 @@ public class Model {
 	
 	public HashMap<String, ResourceInstance> findInstancesInSubnet(String idSubnte){
 		HashMap<String, ResourceInstance> matchingAttributes = new HashMap<>();
-		for (String id : instances.keySet()) {
-			ResourceInstance attr = instances.get(id);
+		for (String id : rInstances.keySet()) {
+			ResourceInstance attr = rInstances.get(id);
 			if (attr.subnet_id.equals(idSubnte)){
 				matchingAttributes.put(id, attr);
 			}
@@ -140,8 +145,8 @@ public class Model {
 	
 	public ResourceEip findEipAttributes(String idEip){
 		ResourceEip eipAttributes = null;
-		for (String id : eips.keySet()) {
-			eipAttributes = eips.get(id);
+		for (String id : rEips.keySet()) {
+			eipAttributes = rEips.get(id);
 			if (eipAttributes.id.equals(idEip)){
 				return eipAttributes;
 			}
@@ -151,8 +156,8 @@ public class Model {
 	
 	public HashMap<String, ResourceInternetGateway> findInternetGatewaysAttributesInVpc(String idVpc) {
 		HashMap<String, ResourceInternetGateway> matchingAttributes = new HashMap<>();
-		for (String id : internetGateways.keySet()) {
-			ResourceInternetGateway attr = internetGateways.get(id);
+		for (String id : rInternetGateways.keySet()) {
+			ResourceInternetGateway attr = rInternetGateways.get(id);
 			if (attr.vpc_id.equals(idVpc)){
 				matchingAttributes.put(id, attr);
 			}
@@ -162,8 +167,8 @@ public class Model {
 
 	public HashMap<String, ResourceVpnGateway> findVpnGatewaysAttributesInVpc(String idVpc) {
 		HashMap<String, ResourceVpnGateway> matchingAttributes = new HashMap<>();
-		for (String id : vpnGateways.keySet()) {
-			ResourceVpnGateway attr = vpnGateways.get(id);
+		for (String id : rVpnGateways.keySet()) {
+			ResourceVpnGateway attr = rVpnGateways.get(id);
 			if (attr.vpc_id.equals(idVpc)){
 				matchingAttributes.put(id, attr);
 			}
@@ -173,8 +178,8 @@ public class Model {
 	
 	public HashMap<String, ResourceVpcEndpoint> findVpcEndpointAttributesInVpc(String idVpc) {
 		HashMap<String, ResourceVpcEndpoint> matchingAttributes = new HashMap<>();
-		for (String id : vpcEndpoints.keySet()) {
-			ResourceVpcEndpoint attr = vpcEndpoints.get(id);
+		for (String id : rVpcEndpoints.keySet()) {
+			ResourceVpcEndpoint attr = rVpcEndpoints.get(id);
 			if (attr.vpc_id.equals(idVpc)){
 				matchingAttributes.put(id, attr);
 			}
@@ -184,8 +189,8 @@ public class Model {
 
 	public HashMap<String, ResourceRouteTable> findRouteTablesAttributesInVpc(String idVpc) {
 		HashMap<String, ResourceRouteTable> matchingAttributes = new HashMap<>();
-		for (String id : routeTables.keySet()) {
-			ResourceRouteTable attr = routeTables.get(id);
+		for (String id : rRouteTables.keySet()) {
+			ResourceRouteTable attr = rRouteTables.get(id);
 			if (attr.vpc_id.equals(idVpc)){
 				matchingAttributes.put(id, attr);
 			}
@@ -195,8 +200,8 @@ public class Model {
 
 	public HashMap<String, ResourceRouteTableAssociation> findRouteTablesAssociationAttributesForRouteTables(String idRouteTable) {
 		HashMap<String, ResourceRouteTableAssociation> matchingAttributes = new HashMap<>();
-		for (String id : routeTableAssociations.keySet()) {
-			ResourceRouteTableAssociation attr = routeTableAssociations.get(id);
+		for (String id : rRouteTableAssociations.keySet()) {
+			ResourceRouteTableAssociation attr = rRouteTableAssociations.get(id);
 			if (attr.route_table_id.equals(idRouteTable)){
 				matchingAttributes.put(id, attr);
 			}
@@ -204,11 +209,11 @@ public class Model {
 		return matchingAttributes;
 	}
 	
-	public HashMap<String, DataSubnetIds> findSubnetIdssAttributesInVpc(String idVpc) {
+	public HashMap<String, DataSubnetIds> findDSubnetIdssAttributesInDVpc(String idDVpc) {
 		HashMap<String, DataSubnetIds> matchingAttributes = new HashMap<>();
-		for (String id : subnetIdss.keySet()) {
-			DataSubnetIds attr = subnetIdss.get(id);
-			if (attr.vpc_id.equals(idVpc)){
+		for (String id : dSubnetIdss.keySet()) {
+			DataSubnetIds attr = dSubnetIdss.get(id);
+			if (attr.vpc_id.equals(idDVpc)){
 				matchingAttributes.put(id, attr);
 			}
 		}

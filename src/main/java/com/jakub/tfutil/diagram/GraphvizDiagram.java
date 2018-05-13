@@ -5,6 +5,7 @@ import java.util.HashSet;
 
 import com.jakub.tfutil.Model;
 import com.jakub.tfutil.aws.data.DataSubnetIds;
+import com.jakub.tfutil.aws.data.DataVpc;
 import com.jakub.tfutil.aws.resources.ResourceEip;
 import com.jakub.tfutil.aws.resources.ResourceInstance;
 import com.jakub.tfutil.aws.resources.ResourceInternetGateway;
@@ -35,14 +36,14 @@ public class GraphvizDiagram{
 "digraph G {\n"+
 "    rankdir=TB;\n");
 		
-//Vpc
-		HashMap<String, ResourceVpc> vpcs = model.vpcs;
+//RVpc
+		HashMap<String, ResourceVpc> rVpcs = model.rVpcs;
 
-		for (String idVpc : vpcs.keySet()) {
-			ResourceVpc vpc = vpcs.get(idVpc);
-			System.out.println("vpc: " + idVpc);
+		for (String idRVpc : rVpcs.keySet()) {
+			ResourceVpc rVpc = rVpcs.get(idRVpc);
+			System.out.println("rVpc: " + idRVpc);
 
-			HashSet<String> zones = model.findAvailabilityZonesInVpc(idVpc);
+			HashSet<String> zones = model.findAvailabilityZonesInVpc(idRVpc);
 //			zones.clear();
 //			zones.add("eu-west-1c");
 			
@@ -52,8 +53,8 @@ public class GraphvizDiagram{
 "        color=lightgrey;\n"+
 "        node [style=filled,color=white, shape=box];\n"+
 //"           a0 -> a1 -> a2 -> a3;\n"+
-"        label = \"VPC: "+ vpc.tagsName+" ("+ vpc.id+")\";\n"+
-"        \""+vpc.id+"\" [label = \"{tfName: "+ vpc.tfName +"|id: "+idVpc+"| cidr_block: "+vpc.cidr_block+"}\" shape = \"record\" ];\n");
+"        label = \"VPC: "+ rVpc.tagsName+" ("+ rVpc.id+")\";\n"+
+"        \""+rVpc.id+"\" [label = \"{tfName: "+ rVpc.tfName +"|id: "+idRVpc+"| cidr_block: "+rVpc.cidr_block+"}\" shape = \"record\" ];\n");
 
 //Gateways		
 			diagram.append(
@@ -62,7 +63,7 @@ public class GraphvizDiagram{
 "            label=Gateways\n");
 		
 //Igw
-			HashMap<String, ResourceInternetGateway> igws = model.findInternetGatewaysAttributesInVpc(idVpc);
+			HashMap<String, ResourceInternetGateway> igws = model.findInternetGatewaysAttributesInVpc(idRVpc);
 			for (String idIgw : igws.keySet()) {
 				ResourceInternetGateway igw = igws.get(idIgw);
 				allDisplayedIgws.put(idIgw, igw);
@@ -78,7 +79,7 @@ public class GraphvizDiagram{
 //Igw - end
 
 //Vpn Gw
-			HashMap<String, ResourceVpnGateway> vpnGws = model.findVpnGatewaysAttributesInVpc(idVpc);
+			HashMap<String, ResourceVpnGateway> vpnGws = model.findVpnGatewaysAttributesInVpc(idRVpc);
 			for (String idVpnGw : vpnGws.keySet()) {
 				ResourceVpnGateway vpnGw = vpnGws.get(idVpnGw);
 				allDisplayedVpnGws.put(idVpnGw, vpnGw);
@@ -94,7 +95,7 @@ public class GraphvizDiagram{
 //Vpn Gw - end
 		
 //Vpc Endpoints			
-			HashMap<String, ResourceVpcEndpoint> vpcEndpoints = model.findVpcEndpointAttributesInVpc(idVpc);
+			HashMap<String, ResourceVpcEndpoint> vpcEndpoints = model.findVpcEndpointAttributesInVpc(idRVpc);
 			for (String idVpcEndpoint : vpcEndpoints.keySet()) {
 				ResourceVpcEndpoint vpcEndpoint = vpcEndpoints.get(idVpcEndpoint);
 				allDisplayedVpcEndpoints.put(idVpcEndpoint, vpcEndpoint);
@@ -113,30 +114,10 @@ public class GraphvizDiagram{
 			diagram.append(
 "        }\n");
 
-//Subnet IDs
-		HashMap<String, DataSubnetIds> subnetIdss = model.findSubnetIdssAttributesInVpc(idVpc);
-		for (String idSubnetIds : subnetIdss.keySet()) {
-			DataSubnetIds subnetIds = subnetIdss.get(idSubnetIds);
-			for (String subnetId : subnetIds.ids) {
-				System.out.println("vpc: " + idVpc + " subnetId: " + subnetId);
-				diagram.append(
-"        subgraph cluster_"+(c++)+" {\n"+
-"            node [style=filled];\n"+
-"            style=\"dashed, rounded\";\n"+
-"            color=green\n"+
-"            label = \"SubnetId: "+ subnetId+"\"\n"+
-"            \""+subnetId+"\" [label = \"{id: "+subnetId+"}\" shape = \"record\" ];\n"+
-"            }\n");
-			}
-		}
-			
-//Subnet IDs - end
-			
-
 //Zones
 			for (String zone : zones) {
 				allDisplayedZones.add(zone);
-				System.out.println("vpc: " + idVpc +" zone: " + zone);
+				System.out.println("vpc: " + idRVpc +" zone: " + zone);
 				diagram.append(
 "        subgraph cluster_"+(c++)+" {\n"+
 "            node [style=filled];\n"+
@@ -144,7 +125,7 @@ public class GraphvizDiagram{
 "            label = \"Availability zone: "+ zone +"\"\n");
 		
 //Subnets		
-				HashMap<String, ResourceSubnet> subnets = model.findSubnetsAttributesInVpcInZone(idVpc, zone);
+				HashMap<String, ResourceSubnet> subnets = model.findSubnetsAttributesInVpcInZone(idRVpc, zone);
 				for (String idSubnet : subnets.keySet()) {
 					ResourceSubnet subnet = subnets.get(idSubnet);
 					diagram.append(
@@ -211,7 +192,7 @@ public class GraphvizDiagram{
 //Route tables
 			if (showRouteTables){
 
-				HashMap<String, ResourceRouteTable> routeTables = model.findRouteTablesAttributesInVpc(idVpc);
+				HashMap<String, ResourceRouteTable> routeTables = model.findRouteTablesAttributesInVpc(idRVpc);
 				for (String idRouteTable : routeTables.keySet()) {
 					ResourceRouteTable routeTable = routeTables.get(idRouteTable);
 					diagram.append(
@@ -253,10 +234,50 @@ public class GraphvizDiagram{
 				
 //Route table associations - end
 			
-//Vpc - end
+//RVpc - end
 			diagram.append(				
 "    }\n");
 		}
+		
+//DVpc
+		HashMap<String, DataVpc> dVpcs = model.dVpcs;
+		for (String idDVpc : dVpcs.keySet()) {
+			DataVpc dVpc = dVpcs.get(idDVpc);
+			System.out.println("dVpc: " + idDVpc);
+			diagram.append(				
+"    subgraph cluster_"+(c++)+" {\n"+
+"        style=\"dashed, rounded\";\n"+
+"        color=lightgrey;\n"+
+"        node [style=dashed,color=white, shape=box];\n"+
+//"           a0 -> a1 -> a2 -> a3;\n"+
+"        label = \"VPC: "+ dVpc.tagsName+" ("+ idDVpc+")\";\n"+
+"        \""+idDVpc+"\" [label = \"{tfName: "+ dVpc.tfName +"|id: "+idDVpc+"| cidr_block: "+dVpc.cidr_block+"}\" shape = \"record\" ];\n");
+
+//Subnet IDs
+			HashMap<String, DataSubnetIds> dSubnetIdss = model.findDSubnetIdssAttributesInDVpc(idDVpc);
+			for (String idDSubnetIds : dSubnetIdss.keySet()) {
+				DataSubnetIds dSubnetIds = dSubnetIdss.get(idDSubnetIds);
+				for (String dSubnetId : dSubnetIds.ids) {
+					System.out.println("dVpc: " + idDVpc + " subnetId: " + dSubnetId);
+					diagram.append(
+	"        subgraph cluster_"+(c++)+" {\n"+
+	"            node [style=dashed];\n"+
+	"            style=\"dashed, rounded\";\n"+
+	"            color=green\n"+
+	"            label = \"DSubnetId: "+ dSubnetId+"\"\n"+
+	"            \""+dSubnetId+"\" [label = \"{id: "+dSubnetId+"}\" shape = \"record\" ];\n"+
+	"            }\n");
+				}
+			}
+				
+	//Subnet IDs - end
+			
+
+
+//DVpc - end
+			diagram.append(				
+"    }\n");
+		}			
 			
 //External
 		diagram.append(
@@ -288,7 +309,7 @@ public class GraphvizDiagram{
 		
 //Endpoints
 		for (String idVpcEndpoint : allDisplayedVpcEndpoints.keySet()) {
-			ResourceVpcEndpoint vpcEndpoint = model.vpcEndpoints.get(idVpcEndpoint);
+			ResourceVpcEndpoint vpcEndpoint = model.rVpcEndpoints.get(idVpcEndpoint);
 			diagram.append(
 "        \""+idVpcEndpoint+"\" -> \"AWS "+vpcEndpoint.service_name+"\" \n");
 		}		
