@@ -21,7 +21,7 @@ import com.jakub.tfutil.aws.resources.ResourceVpc;
 import com.jakub.tfutil.aws.resources.ResourceVpcEndpoint;
 import com.jakub.tfutil.aws.resources.ResourceVpnGateway;
 
-public class Model {
+public class TfObjectsWarehouse {
 	public HashMap<String, ResourceVpc> rVpcs;
 	public HashMap<String, ResourceSubnet> rSubnets;
 	public HashMap<String, ResourceRoute> rRoutes;
@@ -39,7 +39,7 @@ public class Model {
 	public HashMap<String, DataSubnetIds> dSubnetIdss;
 	public HashMap<String, DataVpc> dVpcs;
 
-	public Model() {
+	public TfObjectsWarehouse() {
 		this.rVpcs = new HashMap<>();
 		this.rSubnets = new HashMap<>();
 		this.rRoutes = new HashMap<>();

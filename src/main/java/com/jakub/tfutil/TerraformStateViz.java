@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -53,8 +52,8 @@ public class TerraformStateViz{
         JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraformDoubleVpc.tfstate");
 //        JsonObject stateJson = terraformRcsViz.parseStateFile("src\\main\\resources\\terraform_ireland.tfstate");
                 
-        Model model = terraformRcsViz.buildModel(stateJson);
-		GraphvizDiagram graphvizDiagram = new GraphvizDiagram(model);
+        TfObjectsWarehouse tfObjectsWarehouse = terraformRcsViz.buildTfObjectWarehouse(stateJson);
+		GraphvizDiagram graphvizDiagram = new GraphvizDiagram(tfObjectsWarehouse);
 		String diagram = graphvizDiagram.draw();
 		System.out.println(diagram);
 		
@@ -75,22 +74,22 @@ public class TerraformStateViz{
         return jsonObject;
     }
 		
-	public Model buildModel(JsonObject stateJson) {
-		Model model = new Model();		
+	public TfObjectsWarehouse buildTfObjectWarehouse(JsonObject stateJson) {
+		TfObjectsWarehouse tfObjectsWarehouse = new TfObjectsWarehouse();		
 		JsonArray modules = stateJson.getAsJsonArray("modules");
 		Iterator<JsonElement> it = modules.iterator();
 	    while(it.hasNext()) {
 	    	JsonElement je = it.next();
-	    	readModule(model, je);			
+	    	readModule(tfObjectsWarehouse, je);
 	    }
-		if (model.rVpcs == null){
+		if (tfObjectsWarehouse.rVpcs == null){
 			System.out.println("TF State file empty - leaving");
 			System.exit(1);
 		}
-	    return model;
+	    return tfObjectsWarehouse;
 	}
 
-	private void readModule(Model model, JsonElement module) {
+	private void readModule(TfObjectsWarehouse tfObjectsWarehouse, JsonElement module) {
 		JsonObject mainModule = module.getAsJsonObject();
 		JsonObject resources = mainModule.getAsJsonObject("resources");
 
@@ -108,11 +107,11 @@ public class TerraformStateViz{
 					DataSubnetIds tfAttr = gson.fromJson(jsonElement, DataSubnetIds.class);
 					tfAttr.tfName = tfName;
 					tfAttr.parseIds(jsonElement.getAsJsonObject().entrySet());
-					model.dSubnetIdss.put(objectKey, tfAttr);
+					tfObjectsWarehouse.dSubnetIdss.put(objectKey, tfAttr);
 				} else if ("aws_vpc".equals(type)) {
 					TfAttributes tfAttr = gson.fromJson(jsonElement, DataVpc.class);
 					tfAttr.tfName = tfName;
-					model.dVpcs.put(objectKey, (DataVpc) tfAttr);
+					tfObjectsWarehouse.dVpcs.put(objectKey, (DataVpc) tfAttr);
 				} else {
 					System.out.println("Unknown data type: " + type);
 				}
@@ -120,55 +119,55 @@ public class TerraformStateViz{
 				if ("aws_instance".equals(type)) {
 					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceInstance.class);
 					tfAttr.tfName = tfName;
-					model.rInstances.put(objectKey, (ResourceInstance) tfAttr);
+					tfObjectsWarehouse.rInstances.put(objectKey, (ResourceInstance) tfAttr);
 				} else if ("aws_vpc_endpoint".equals(type)) {
 					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceVpcEndpoint.class);
 					tfAttr.tfName = tfName;
-					model.rVpcEndpoints.put(objectKey, (ResourceVpcEndpoint) tfAttr);
+					tfObjectsWarehouse.rVpcEndpoints.put(objectKey, (ResourceVpcEndpoint) tfAttr);
 				} else if ("aws_security_group".equals(type)) {
 					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceSecurityGroup.class);
 					tfAttr.tfName = tfName;
-					model.rSecurityGroups.put(objectKey, (ResourceSecurityGroup) tfAttr);
+					tfObjectsWarehouse.rSecurityGroups.put(objectKey, (ResourceSecurityGroup) tfAttr);
 				} else if ("aws_security_group_rule".equals(type)) {
 					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceSecurityGroupRule.class);
 					tfAttr.tfName = tfName;
-					model.rSecurityGroupRules.put(objectKey, (ResourceSecurityGroupRule) tfAttr);
+					tfObjectsWarehouse.rSecurityGroupRules.put(objectKey, (ResourceSecurityGroupRule) tfAttr);
 				} else if ("aws_vpn_gateway".equals(type)) {
 					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceVpnGateway.class);
 					tfAttr.tfName = tfName;
-					model.rVpnGateways.put(objectKey, (ResourceVpnGateway) tfAttr);
+					tfObjectsWarehouse.rVpnGateways.put(objectKey, (ResourceVpnGateway) tfAttr);
 				} else if ("aws_eip".equals(type)) {
 					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceEip.class);
 					tfAttr.tfName = tfName;
-					model.rEips.put(objectKey, (ResourceEip) tfAttr);
+					tfObjectsWarehouse.rEips.put(objectKey, (ResourceEip) tfAttr);
 				} else if ("aws_internet_gateway".equals(type)) {
 					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceInternetGateway.class);
 					tfAttr.tfName = tfName;
-					model.rInternetGateways.put(objectKey, (ResourceInternetGateway) tfAttr);
+					tfObjectsWarehouse.rInternetGateways.put(objectKey, (ResourceInternetGateway) tfAttr);
 				} else if ("aws_nat_gateway".equals(type)) {
 					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceNatGateway.class);
 					tfAttr.tfName = tfName;
-					model.rNatGateways.put(objectKey, (ResourceNatGateway) tfAttr);
+					tfObjectsWarehouse.rNatGateways.put(objectKey, (ResourceNatGateway) tfAttr);
 				} else if ("aws_route".equals(type)) {
 					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceRoute.class);
 					tfAttr.tfName = tfName;
-					model.rRoutes.put(objectKey, (ResourceRoute) tfAttr);
+					tfObjectsWarehouse.rRoutes.put(objectKey, (ResourceRoute) tfAttr);
 				} else if ("aws_route_table".equals(type)) {
 					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceRouteTable.class);
 					tfAttr.tfName = tfName;
-					model.rRouteTables.put(objectKey, (ResourceRouteTable) tfAttr);
+					tfObjectsWarehouse.rRouteTables.put(objectKey, (ResourceRouteTable) tfAttr);
 				} else if ("aws_route_table_association".equals(type)) {
 					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceRouteTableAssociation.class);
 					tfAttr.tfName = tfName;
-					model.rRouteTableAssociations.put(objectKey, (ResourceRouteTableAssociation) tfAttr);
+					tfObjectsWarehouse.rRouteTableAssociations.put(objectKey, (ResourceRouteTableAssociation) tfAttr);
 				} else if ("aws_subnet".equals(type)) {
 					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceSubnet.class);
 					tfAttr.tfName = tfName;
-					model.rSubnets.put(objectKey, (ResourceSubnet) tfAttr);
+					tfObjectsWarehouse.rSubnets.put(objectKey, (ResourceSubnet) tfAttr);
 				} else if ("aws_vpc".equals(type)) {
 					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceVpc.class);
 					tfAttr.tfName = tfName;
-					model.rVpcs.put(objectKey, (ResourceVpc) tfAttr);
+					tfObjectsWarehouse.rVpcs.put(objectKey, (ResourceVpc) tfAttr);
 				} else {
 					System.out.println("Unknown respource type: " + type);
 				}

@@ -7,5 +7,5 @@ public abstract class TfData extends TfAttributes {
 	public boolean isRespource() {
 		return false;
 	}
-	
+
 }
