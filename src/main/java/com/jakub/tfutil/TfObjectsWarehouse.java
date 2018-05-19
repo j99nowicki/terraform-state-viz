@@ -166,30 +166,6 @@ public class TfObjectsWarehouse {
 		return null;
 	}
 	
-	public HashMap<String, ResourceInternetGateway> findInternetGatewaysAttributesInVpc(String idVpc) {
-		HashMap<String, ResourceInternetGateway> matchingAttributes = new HashMap<>();
-		for (String id : rInternetGateways.keySet()) {
-			ResourceInternetGateway attr = rInternetGateways.get(id);
-			if (attr.vpc_id.equals(idVpc)){
-				matchingAttributes.put(id, attr);
-			}
-		}
-		return matchingAttributes;
-	}
-
-	public HashMap<String, ResourceVpnGateway> findVpnGatewaysAttributesInVpc(String idVpc) {
-		HashMap<String, ResourceVpnGateway> matchingAttributes = new HashMap<>();
-		for (String id : rVpnGateways.keySet()) {
-			ResourceVpnGateway attr = rVpnGateways.get(id);
-			if (attr.vpc_id.equals(idVpc)){
-				matchingAttributes.put(id, attr);
-			}
-		}
-		return matchingAttributes;
-	}
-	
-
-
 	public HashMap<String, ResourceRouteTable> findRouteTablesAttributesInVpc(String idVpc) {
 		HashMap<String, ResourceRouteTable> matchingAttributes = new HashMap<>();
 		for (String id : rRouteTables.keySet()) {

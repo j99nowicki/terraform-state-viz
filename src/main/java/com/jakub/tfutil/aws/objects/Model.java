@@ -6,13 +6,17 @@ import java.util.HashSet;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import com.jakub.tfutil.TfObjectsWarehouse;
 import com.jakub.tfutil.aws.data.DataVpc;
+import com.jakub.tfutil.aws.resources.ResourceInternetGateway;
 import com.jakub.tfutil.aws.resources.ResourceSubnet;
 import com.jakub.tfutil.aws.resources.ResourceVpc;
 import com.jakub.tfutil.aws.resources.ResourceVpcEndpoint;
+import com.jakub.tfutil.aws.resources.ResourceVpnGateway;
 
 public class Model {
 	public HashMap<String, Vpc> vpcs = new HashMap<>();
 	public HashMap<String, VpcEndpoint> vpcEndpoints = new HashMap<>();
+	public HashMap<String, VpnGateway> vpnGateways = new HashMap<>();
+	public HashMap<String, InternetGateway> internetGateways = new HashMap<>();
 	
 	@Override
 	public String toString()
@@ -34,6 +38,29 @@ public class Model {
 			ResourceVpcEndpoint item = tfObjectsWarehouse.rVpcEndpoints.get(key);
 			vpcEndpoints.put(key, new VpcEndpoint(item));
 		}
+		
+		for (String key : tfObjectsWarehouse.rVpnGateways.keySet()) {
+			ResourceVpnGateway item = tfObjectsWarehouse.rVpnGateways.get(key);
+			vpnGateways.put(key, new VpnGateway(item));
+		}
+
+		for (String key : tfObjectsWarehouse.rInternetGateways.keySet()) {
+			ResourceInternetGateway item = tfObjectsWarehouse.rInternetGateways.get(key);
+			internetGateways.put(key, new InternetGateway(item));
+		}
+	}
+	
+	
+	
+	public HashMap<String, InternetGateway> findInternetGatewaysAttributesInVpc(String idVpc) {
+		HashMap<String, InternetGateway> matchingElements = new HashMap<>();
+		for (String id : internetGateways.keySet()) {
+			InternetGateway attr = internetGateways.get(id);
+			if (attr.vpc_id.equals(idVpc)){
+				matchingElements.put(id, attr);
+			}
+		}
+		return matchingElements;
 	}
 	
 	
@@ -48,5 +75,15 @@ public class Model {
 		return matchingElements;
 	}
 	
+	public HashMap<String, VpnGateway> findVpnGatewaysAttributesInVpc(String idVpc) {
+		HashMap<String, VpnGateway> matchingElements = new HashMap<>();
+		for (String id : vpnGateways.keySet()) {
+			VpnGateway attr = vpnGateways.get(id);
+			if (attr.vpc_id.equals(idVpc)){
+				matchingElements.put(id, attr);
+			}
+		}
+		return matchingElements;
+	}
 	
 }

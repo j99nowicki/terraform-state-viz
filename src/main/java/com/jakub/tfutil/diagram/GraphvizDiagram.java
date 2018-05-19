@@ -6,9 +6,11 @@ import java.util.HashSet;
 import com.jakub.tfutil.TfObjectsWarehouse;
 import com.jakub.tfutil.aws.data.DataSubnetIds;
 import com.jakub.tfutil.aws.data.DataVpc;
+import com.jakub.tfutil.aws.objects.InternetGateway;
 import com.jakub.tfutil.aws.objects.Model;
 import com.jakub.tfutil.aws.objects.Vpc;
 import com.jakub.tfutil.aws.objects.VpcEndpoint;
+import com.jakub.tfutil.aws.objects.VpnGateway;
 import com.jakub.tfutil.aws.resources.ResourceEip;
 import com.jakub.tfutil.aws.resources.ResourceInstance;
 import com.jakub.tfutil.aws.resources.ResourceInternetGateway;
@@ -18,15 +20,14 @@ import com.jakub.tfutil.aws.resources.ResourceRouteTableAssociation;
 import com.jakub.tfutil.aws.resources.ResourceRouteTable;
 import com.jakub.tfutil.aws.resources.ResourceSubnet;
 import com.jakub.tfutil.aws.resources.ResourceVpcEndpoint;
-import com.jakub.tfutil.aws.resources.ResourceVpnGateway;
 
 public class GraphvizDiagram{
 	private boolean showRouteTables = true;
 	
 	private StringBuffer diagram = new StringBuffer();
 	static int c=0;
-	private HashMap<String, ResourceInternetGateway> allDisplayedIgws = new HashMap<String, ResourceInternetGateway>();
-	private HashMap<String, ResourceVpnGateway> allDisplayedVpnGws = new HashMap<String, ResourceVpnGateway>();
+	private HashMap<String, InternetGateway> allDisplayedIgws = new HashMap<String, InternetGateway>();
+	private HashMap<String, VpnGateway> allDisplayedVpnGws = new HashMap<String, VpnGateway>();
 	private HashMap<String, VpcEndpoint> allDisplayedVpcEndpoints = new HashMap<String, VpcEndpoint>();
 	private HashMap<String, ResourceNatGateway> displayedNatGws = new HashMap<String, ResourceNatGateway>();
 	private HashSet<String> allDisplayedZones = new HashSet<String>();
@@ -65,7 +66,7 @@ public class GraphvizDiagram{
 "        \""+vpc.id+"\" [label = \"{tfName: "+ vpc.tfName +"|id: "+idVpc+"| cidr_block: "+vpc.cidr_block+"}\" shape = \"record\" ];\n");
 
 //Gateways		
-			printRGateways(idVpc);
+			printGateways(idVpc);
 
 //Zones
 			for (String zone : visibleRZones) {
@@ -327,50 +328,16 @@ public class GraphvizDiagram{
 		}
 	}
 
-	private void printRGateways(String idVpc) {
+	private void printGateways(String idVpc) {
 		diagram.append(
 "        subgraph cluster_"+(c++)+" {\n"+
 "            style=invisible\n"+
 "            label=Gateways\n");
-		printRInternetGateways(idVpc);
-		printRVpnGateways(idVpc);		
+		GraphvizInternetGateway.printInternetGateways(diagram, model, idVpc, allDisplayedIgws);
+		GraphvizVpnGateway.printVpnGateways(diagram, model, idVpc, allDisplayedVpnGws);
 		GraphvizVpcEndpoint.printVpcEndpoints(diagram, model, idVpc, allDisplayedVpcEndpoints);
 		diagram.append(
 "        }\n");
-	}
-
-
-
-	private void printRVpnGateways(String idRVpc) {
-		HashMap<String, ResourceVpnGateway> vpnGws = tfObjectsWarehouse.findVpnGatewaysAttributesInVpc(idRVpc);
-		for (String idVpnGw : vpnGws.keySet()) {
-			ResourceVpnGateway vpnGw = vpnGws.get(idVpnGw);
-			allDisplayedVpnGws.put(idVpnGw, vpnGw);
-			diagram.append(
-"            subgraph cluster_"+(c++)+" {\n"+
-"                \"icon"+vpnGw.id+"\" [label=\"R VPN GW\" shape=cds]\n"+
-"                node [style=filled];\n"+
-"                color=royalblue1\n"+
-"                style=\"filled,rounded\" label = \"VPN GW: "+ vpnGw.tagsName+"\"\n"+
-"                \""+idVpnGw+"\" [label = \"{tfName: "+ vpnGw.tfName+"|id: "+idVpnGw+"|amazon side ASN: "+vpnGw.amazon_side_asn+"}\" shape = \"record\" ];\n"+
-"            }\n");
-		}
-	}
-
-	private void printRInternetGateways(String idRVpc) {
-		HashMap<String, ResourceInternetGateway> igws = tfObjectsWarehouse.findInternetGatewaysAttributesInVpc(idRVpc);
-		for (String idIgw : igws.keySet()) {
-			ResourceInternetGateway igw = igws.get(idIgw);
-			allDisplayedIgws.put(idIgw, igw);
-			diagram.append(
-"            subgraph cluster_"+(c++)+" {\n"+
-"                \"icon"+idIgw+"\" [label=\"RInternet GW\" shape=lpromoter]\n"+
-"                node [style=filled];\n"+
-"                color=red;\n"+
-"                style=\"filled,rounded\" label = \"Internet GW: "+ igw.tagsName+"\"\n"+
-"                \""+idIgw+"\" [label = \"{tfName: "+ igw.tfName+"|id: "+idIgw +"}\" shape = \"record\" ];\n"+
-"            }\n");
-		}
 	}
 
 }
