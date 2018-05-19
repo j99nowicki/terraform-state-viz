@@ -7,11 +7,11 @@ import com.jakub.tfutil.aws.objects.VpcEndpoint;
 
 public class GraphvizVpcEndpoint {
 	
-	public static void printVpcEndpoints(StringBuffer diagram, Model model, String idVpc, HashMap<String, VpcEndpoint> allDisplayedVpcEndpoints) {
+	public static void printVpcEndpoints(StringBuffer diagram, Model model, String idVpc) {
 		HashMap<String, VpcEndpoint> vpcEndpoints = model.findVpcEndpointsInVpc(idVpc);
 		for (String idVpcEndpoint : vpcEndpoints.keySet()) {
 			VpcEndpoint vpcEndpoint = vpcEndpoints.get(idVpcEndpoint);
-			allDisplayedVpcEndpoints.put(idVpcEndpoint, vpcEndpoint);
+			GraphvizDiagram.allDisplayedVpcEndpoints.put(idVpcEndpoint, vpcEndpoint);
 			String style = (vpcEndpoint.isResource()?"filled":"dashed");
 			diagram.append(
 "            subgraph cluster_"+(GraphvizDiagram.c++)+" {\n"+

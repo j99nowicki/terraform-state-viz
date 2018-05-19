@@ -7,11 +7,11 @@ import com.jakub.tfutil.aws.objects.VpnGateway;
 
 public class GraphvizVpnGateway {
 	
-	public static void printVpnGateways(StringBuffer diagram, Model model, String idVpc, HashMap<String, VpnGateway> allDisplayedVpnGws) {
+	public static void printVpnGateways(StringBuffer diagram, Model model, String idVpc) {
 		HashMap<String, VpnGateway> vpnGws = model.findVpnGatewaysInVpc(idVpc);
 		for (String idVpnGw : vpnGws.keySet()) {
 			VpnGateway vpnGw = vpnGws.get(idVpnGw);
-			allDisplayedVpnGws.put(idVpnGw, vpnGw);
+			GraphvizDiagram.allDisplayedVpnGws.put(idVpnGw, vpnGw);
 			String style = (vpnGw.isResource()?"filled":"dashed");
 			diagram.append(
 "            subgraph cluster_"+(GraphvizDiagram.c++)+" {\n"+

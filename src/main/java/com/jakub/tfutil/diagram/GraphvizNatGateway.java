@@ -5,12 +5,11 @@ import java.util.HashMap;
 import com.jakub.tfutil.aws.objects.Eip;
 import com.jakub.tfutil.aws.objects.Model;
 import com.jakub.tfutil.aws.objects.NatGateway;
-import com.jakub.tfutil.aws.resources.ResourceSubnet;
 
 public class GraphvizNatGateway {
 	
-	public static void printNatGateways(StringBuffer diagram,  Model model, ResourceSubnet subnet, HashMap<String, NatGateway> displayedNatGws) {
-		HashMap<String, NatGateway> natGws = model.findNatGatewaysInSubnet(subnet.id);
+	public static void printNatGateways(StringBuffer diagram,  Model model, String idSubnet, HashMap<String, NatGateway> displayedNatGws) {
+		HashMap<String, NatGateway> natGws = model.findNatGatewaysInSubnet(idSubnet);
 		for (String idNatGw : natGws.keySet()) {
 			NatGateway natGw = natGws.get(idNatGw);
 			displayedNatGws.put(idNatGw, natGw);
@@ -21,7 +20,7 @@ public class GraphvizNatGateway {
 "                    node [style=filled];\n"+
 "                    color=salmon\n"+
 "                    style="+style+"\n"+
-"                    label = \"Nat GW: "+ subnet.tagsName+"\"\n"+
+"                    label = \"Nat GW: "+ natGw.tagsName+"\"\n"+
 "                    \""+idNatGw+"\" [label = \"{tfName: "+ natGw.tfName+"|id: "+idNatGw+"|public IP: "+natGw.public_ip+"|private IP: "+natGw.private_ip+"}\" shape = \"record\" ];\n");
 //Eip
 			Eip eip = model.findEip(natGw.allocation_id);

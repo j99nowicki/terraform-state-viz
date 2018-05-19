@@ -2,18 +2,15 @@ package com.jakub.tfutil.diagram;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import com.jakub.tfutil.TfObjectsWarehouse;
-import com.jakub.tfutil.aws.data.DataSubnetIds;
-import com.jakub.tfutil.aws.data.DataVpc;
-import com.jakub.tfutil.aws.objects.Instance;
 import com.jakub.tfutil.aws.objects.InternetGateway;
 import com.jakub.tfutil.aws.objects.Model;
 import com.jakub.tfutil.aws.objects.NatGateway;
 import com.jakub.tfutil.aws.objects.Vpc;
 import com.jakub.tfutil.aws.objects.VpcEndpoint;
 import com.jakub.tfutil.aws.objects.VpnGateway;
-import com.jakub.tfutil.aws.resources.ResourceInstance;
 import com.jakub.tfutil.aws.resources.ResourceRoute;
 import com.jakub.tfutil.aws.resources.ResourceRouteTableAssociation;
 import com.jakub.tfutil.aws.resources.ResourceRouteTable;
@@ -25,11 +22,11 @@ public class GraphvizDiagram{
 	
 	private StringBuffer diagram = new StringBuffer();
 	static int c=0;
-	private HashMap<String, InternetGateway> allDisplayedIgws = new HashMap<String, InternetGateway>();
-	private HashMap<String, VpnGateway> allDisplayedVpnGws = new HashMap<String, VpnGateway>();
-	private HashMap<String, VpcEndpoint> allDisplayedVpcEndpoints = new HashMap<String, VpcEndpoint>();
-	private HashMap<String, NatGateway> displayedNatGws = new HashMap<String, NatGateway>();
-	private HashSet<String> allDisplayedZones = new HashSet<String>();
+	public static HashMap<String, InternetGateway> allDisplayedIgws = new HashMap<String, InternetGateway>();
+	public static HashMap<String, VpnGateway> allDisplayedVpnGws = new HashMap<String, VpnGateway>();
+	public static HashMap<String, VpcEndpoint> allDisplayedVpcEndpoints = new HashMap<String, VpcEndpoint>();
+	public static HashMap<String, NatGateway> displayedNatGws = new HashMap<String, NatGateway>();
+	public static HashSet<String> allDisplayedZones = new HashSet<String>();
 	private TfObjectsWarehouse tfObjectsWarehouse = null;
 	
 	private Model model;
@@ -46,19 +43,20 @@ public class GraphvizDiagram{
 "digraph G {\n"+
 "    rankdir=TB;\n");
 		
-//RVpc
+//Vpc
 		HashMap<String, Vpc> vpcs = model.vpcs;
 
 		for (String idVpc : vpcs.keySet()) {
 			Vpc vpc = vpcs.get(idVpc);
 
-			HashSet<String> visibleRZones = tfObjectsWarehouse.findAvailabilityZonesInRVpc(idVpc);
+			Set<String> visibleZones = vpc.getAvailabilityZones();
 //			zones.clear();
 //			zones.add("eu-west-1c");
-			
+			String style = (vpc.isResource()?"filled":"dashed");
+
 			diagram.append(				
 "    subgraph cluster_"+(c++)+" {\n"+
-"        style=\"filled,rounded\";\n"+
+"        style=\""+style+",rounded\";\n"+
 "        color=lightgrey;\n"+
 "        node [style=filled,color=white, shape=box];\n"+
 "        label = \"VPC: "+ vpc.tagsName+" ("+ vpc.id+")\";\n"+
@@ -68,108 +66,20 @@ public class GraphvizDiagram{
 			printGateways(idVpc);
 
 //Zones
-			for (String zone : visibleRZones) {
+			for (String zone : visibleZones) {
 				allDisplayedZones.add(zone);
-				diagram.append(
-"        subgraph cluster_"+(c++)+" {\n"+
-"            node [style=filled];\n"+
-"            color=turquoise\n"+
-"            label = \"Availability zone: "+ zone +"\"\n");
-		
-//Subnets		
-				HashMap<String, ResourceSubnet> subnets = tfObjectsWarehouse.findSubnetsAttributesInVpcInZone(idVpc, zone);
-				for (String idSubnet : subnets.keySet()) {
-					ResourceSubnet subnet = subnets.get(idSubnet);
-					diagram.append(
-"            subgraph cluster_"+(c++)+" {\n"+
-"                node [style=filled];\n"+
-"                color=green\n"+
-"                label = \"Subnet: "+ subnet.tagsName+"\"\n"+
-"                \""+subnet.id+"\" [label = \"{tfName: "+ subnet.tfName+"|id: "+idSubnet+"|cidr_block: "+subnet.cidr_block+"}\" shape = \"record\" ];\n");
-
-//Instances
-					GraphvizInstance.printInstances(diagram, model, subnet.id);	
-//Nat Gw
-					GraphvizNatGateway.printNatGateways(diagram, model, subnet, displayedNatGws);
-//Subnets - end
-					diagram.append(						
-"            }\n");
-				}
-//Zones - end
-				diagram.append(
-"        }\n");
+				GraphvizAvailiabilityZone.printAvailiabilityZone(diagram, model, idVpc, zone);
 			}
 
 //Route tables
-			printRRouteTables(idVpc, visibleRZones);
+			printRRouteTables(idVpc, visibleZones);
 			
-//RVpc - end
+//Vpc - end
 			diagram.append(				
 "    }\n");
 		}
 		
-//DVpc
-		HashMap<String, DataVpc> dVpcs = tfObjectsWarehouse.dVpcs;
-		for (String idDVpc : dVpcs.keySet()) {
-			DataVpc dVpc = dVpcs.get(idDVpc);
-			diagram.append(				
-"    subgraph cluster_"+(c++)+" {\n"+
-"        style=\"dashed, rounded\";\n"+
-"        color=lightgrey;\n"+
-"        node [style=dashed,color=white, shape=box];\n"+
-"        label = \"VPC: "+ dVpc.tagsName+" ("+ idDVpc+")\";\n"+
-"        \""+idDVpc+"\" [label = \"{tfName: "+ dVpc.tfName +"|id: "+idDVpc+"| cidr_block: "+dVpc.cidr_block+"}\" shape = \"record\" ];\n");
-
-//D Subnet IDs
-			HashMap<String, DataSubnetIds> dSubnetIdss = tfObjectsWarehouse.findDSubnetIdssAttributesInDVpc(idDVpc);
-			for (String idDSubnetIds : dSubnetIdss.keySet()) {
-				DataSubnetIds dSubnetIds = dSubnetIdss.get(idDSubnetIds);
-				HashSet<String> visibleDZones = tfObjectsWarehouse.findAvailabilityZonesForInstancesInDVpc(dSubnetIds);
-//				visibleDZones.clear();
-//				visibleDZones.add("eu-west-1c");
-
-//D Zones
-				for (String zone : visibleDZones) {
-					allDisplayedZones.add(zone);
-					diagram.append(
-"        subgraph cluster_"+(c++)+" {\n"+
-"            node [style=\"dashed,filled\"];\n"+
-"            color=turquoise\n"+
-"            label = \"Availability zone: "+ zone +"\"\n");
-
-				
-//D Subnets
-				
-					for (String idDSubnet : dSubnetIds.ids) {
-						diagram.append(
-"        subgraph cluster_"+(c++)+" {\n"+
-"            node [style=dashed];\n"+
-"            style=\"dashed, rounded\";\n"+
-"            color=green\n"+
-"            label = \"DSubnetId: "+ idDSubnet+"\"\n"+
-"            \""+idDSubnet+"\" [label = \"{id: "+idDSubnet+"}\" shape = \"record\" ];\n");
-//D Instances 
-				GraphvizInstance.printInstances(diagram, model, idDSubnet);	
-
-//D Subnets - end
-						diagram.append(
-"            }\n");
-					}
-					
-//Zones - end
-					diagram.append(
-"        }\n");
-				}	
-				
-//D Subnet IDs - end
-			}
-
-
-//DVpc - end
-			diagram.append(				
-"    }\n");
-		}			
-			
+		
 		printRExternals();
 		
 //Diagram- end
@@ -222,7 +132,7 @@ public class GraphvizDiagram{
 "    }\n");
 	}
 
-	private void printRRouteTables(String idRVpc, HashSet<String> visibleZones) {
+	private void printRRouteTables(String idRVpc, Set<String> visibleZones) {
 		if (showRouteTables){
 
 			HashMap<String, ResourceRouteTable> routeTables = tfObjectsWarehouse.findRouteTablesAttributesInVpc(idRVpc);
@@ -268,15 +178,16 @@ public class GraphvizDiagram{
 //Route table associations - end
 	}
 
-		
+	
+	
 	private void printGateways(String idVpc) {
 		diagram.append(
 "        subgraph cluster_"+(c++)+" {\n"+
 "            style=invisible\n"+
 "            label=Gateways\n");
-		GraphvizInternetGateway.printInternetGateways(diagram, model, idVpc, allDisplayedIgws);
-		GraphvizVpnGateway.printVpnGateways(diagram, model, idVpc, allDisplayedVpnGws);
-		GraphvizVpcEndpoint.printVpcEndpoints(diagram, model, idVpc, allDisplayedVpcEndpoints);
+		GraphvizInternetGateway.printInternetGateways(diagram, model, idVpc);
+		GraphvizVpnGateway.printVpnGateways(diagram, model, idVpc);
+		GraphvizVpcEndpoint.printVpcEndpoints(diagram, model, idVpc);
 		diagram.append(
 "        }\n");
 	}

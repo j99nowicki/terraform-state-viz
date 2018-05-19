@@ -97,45 +97,6 @@ public class TfObjectsWarehouse {
 		return matchingAttributes;
 	}
 
-
-	public HashSet<String> findAvailabilityZonesInRVpc(String vpcId){
-		HashSet<String> zones = new HashSet<String>();
-		for (String id : rSubnets.keySet()) {
-			ResourceSubnet attr = rSubnets.get(id);
-			if (vpcId.equals(attr.vpc_id)){
-				zones.add(attr.availability_zone);
-			}
-		}
-		return zones;
-	}
-
-	public HashSet<String> findAvailabilityZonesForInstancesInDVpc(DataSubnetIds dSubnetIds){
-		HashSet<String> zones = new HashSet<String>();
-		for (String idDSubnet : dSubnetIds.ids) {
-			for (String idInstance : rInstances.keySet()) {
-				ResourceInstance attr = rInstances.get(idInstance);
-				if (idDSubnet.equals(attr.subnet_id)){
-					zones.add(attr.availability_zone);
-				}
-			}			
-		}
-		return zones;
-	}
-	
-	public HashMap<String, ResourceSubnet> findSubnetsAttributesInVpcInZone(String idVpc, String zone){
-		HashMap<String, ResourceSubnet> matchingAttributes = new HashMap<>();
-		for (String id : rSubnets.keySet()) {
-			ResourceSubnet attr = rSubnets.get(id);
-			if (attr.vpc_id.equals(idVpc) && attr.availability_zone.equals(zone)){
-				matchingAttributes.put(id, attr);
-			}
-		}
-		return matchingAttributes;
-	}
-	
-
-
-	
 	public HashMap<String, ResourceRouteTable> findRouteTablesAttributesInVpc(String idVpc) {
 		HashMap<String, ResourceRouteTable> matchingAttributes = new HashMap<>();
 		for (String id : rRouteTables.keySet()) {
@@ -158,15 +119,4 @@ public class TfObjectsWarehouse {
 		return matchingAttributes;
 	}
 	
-	public HashMap<String, DataSubnetIds> findDSubnetIdssAttributesInDVpc(String idDVpc) {
-		HashMap<String, DataSubnetIds> matchingAttributes = new HashMap<>();
-		for (String id : dSubnetIdss.keySet()) {
-			DataSubnetIds attr = dSubnetIdss.get(id);
-			if (attr.vpc_id.equals(idDVpc)){
-				matchingAttributes.put(id, attr);
-			}
-		}
-		return matchingAttributes;
-	}
-			
 }

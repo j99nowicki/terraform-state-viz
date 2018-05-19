@@ -36,7 +36,7 @@ public class Model {
 		for (String key : tfObjectsWarehouse.rVpcs.keySet()) {
 			ResourceVpc item = tfObjectsWarehouse.rVpcs.get(key);
 			vpcs.put(key, new Vpc(item));
-					}
+		}
 		for (String key : tfObjectsWarehouse.dVpcs.keySet()) {
 			DataVpc item = tfObjectsWarehouse.dVpcs.get(key);
 			vpcs.put(key, new Vpc(item));
@@ -66,11 +66,6 @@ public class Model {
 			ResourceNatGateway item = tfObjectsWarehouse.rNatGateways.get(key);
 			natGateways.put(key, new NatGateway(item));
 		}
-		
-		for (String key : tfObjectsWarehouse.rInstances.keySet()) {
-			ResourceInstance item = tfObjectsWarehouse.rInstances.get(key);
-			instances.put(key, new Instance(item));
-		}
 
 		for (String key : tfObjectsWarehouse.rSubnets.keySet()) {
 			ResourceSubnet item = tfObjectsWarehouse.rSubnets.get(key);
@@ -80,20 +75,53 @@ public class Model {
 			DataSubnetIds item = tfObjectsWarehouse.dSubnetIdss.get(key);
 			HashSet<String> ids = item.ids;
 			for (String idSubnet : ids) {
-				subnets.put(key, new Subnet(item.vpc_id, idSubnet));				
+				subnets.put(idSubnet, new Subnet(item.vpc_id, idSubnet));				
+			}
+		}	
+		
+		for (String key : tfObjectsWarehouse.rInstances.keySet()) {
+			ResourceInstance item = tfObjectsWarehouse.rInstances.get(key);
+			Instance instance = new Instance(item); 
+			instances.put(key, instance);
+			// move subnet to known AZ if instance references it
+			Subnet subnet = subnets.get(instance.subnet_id);
+			if (Subnet.CONST_AZ_UNKNOWN.equals(subnet.availability_zone)){
+				subnet.availability_zone = instance.availability_zone;
 			}
 		}
-				
+		
+		for (String idVpc : vpcs.keySet()) {
+			vpcs.get(idVpc).setAvailabilityZones(findAvailabilityZonesInVpc(idVpc));
+		}	
+		
 	}
-	
+
+	private HashSet<String> findAvailabilityZonesInVpc(String idVpc){
+		HashSet<String> zones = new HashSet<String>();
+		//search for AZ in subnets
+		for (String idSubnet : subnets.keySet()) {
+			Subnet subnet = subnets.get(idSubnet);
+			if (idVpc.equals(subnet.vpc_id)){
+				zones.add(subnet.availability_zone);
+				//and in instances in each subnet
+				for (String idInstance : instances.keySet()) {
+					Instance instance = instances.get(idInstance);
+					if (idSubnet.equals(instance.subnet_id)){
+						zones.add(instance.availability_zone);
+					}
+				}
+			}
+		}
+		return zones;
+	}
 	
 	
 	public HashMap<String, InternetGateway> findInternetGatewaysInVpc(String idVpc) {
 		HashMap<String, InternetGateway> matchingElements = new HashMap<>();
 		for (String id : internetGateways.keySet()) {
-			InternetGateway attr = internetGateways.get(id);
-			if (attr.vpc_id.equals(idVpc)){
-				matchingElements.put(id, attr);
+			InternetGateway element = internetGateways.get(id);
+			if (element.vpc_id.equals(idVpc)){
+				matchingElements.put(id, element);
 			}
 		}
 		return matchingElements;
@@ -156,5 +184,17 @@ public class Model {
 		}
 		return matchingElements;
 	}	
+	
+	public HashMap<String, Subnet> findSubnetsInVpcInZone(String idVpc, String zone){
+		HashMap<String, Subnet> matchingElements = new HashMap<>();
+		for (String id : subnets.keySet()) {
+			Subnet element = subnets.get(id);
+			if (element.vpc_id.equals(idVpc) && element.availability_zone.equals(zone)){
+				matchingElements.put(id, element);
+			}
+		}
+		return matchingElements;
+	}
 
+	
 }

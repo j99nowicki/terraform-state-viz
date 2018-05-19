@@ -1,5 +1,8 @@
 package com.jakub.tfutil.aws.objects;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.jakub.tfutil.aws.data.DataVpc;
@@ -14,6 +17,8 @@ public class Vpc extends TfObject{
 	public String instance_tenancy;
 	public int tagsCount;
 	public String tagsName;
+
+	private Set<String> availabilityZones= new HashSet<>();
 	
 	private DataVpc dataVpc = null;
 	private ResourceVpc resourcsVpc = null;
@@ -57,5 +62,13 @@ public class Vpc extends TfObject{
 	public ResourceVpc getResourcsVpc() {
 		return resourcsVpc;
 	}
-	
+
+	public Set<String> getAvailabilityZones() {
+		return availabilityZones;
+	}
+
+	public void setAvailabilityZones(Set<String> availabilityZones) {
+		this.availabilityZones = availabilityZones;
+	}
+
 }
