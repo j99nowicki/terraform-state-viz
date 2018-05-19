@@ -3,6 +3,10 @@ package com.jakub.tfutil.aws.objects;
 import com.jakub.tfutil.aws.TfAttributes;
 
 public abstract class TfObject extends TfAttributes {
+	public boolean resource;
 	
-	public abstract boolean isResource();
+	public boolean isResource(){
+		return resource;
+	};
+	
 }

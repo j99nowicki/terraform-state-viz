@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
 public class ResourceVpcEndpoint extends TfResource{
 
 	@SerializedName("cidr_blocks.#")
-	public String CidrBlocksCount;
+	public String cidrBlocksCount;
 //    "cidr_blocks.0": "52.94.5.0/24",
 //    "cidr_blocks.1": "52.119.240.0/21",
 //    "cidr_blocks.2": "52.94.24.0/23",

@@ -14,7 +14,9 @@ public class Vpc extends TfObject{
 	public String instance_tenancy;
 	public int tagsCount;
 	public String tagsName;
-	public boolean resource;
+	
+	private DataVpc dataVpc = null;
+	private ResourceVpc resourcsVpc = null;
 			
 	@Override
 	public String toString()
@@ -23,6 +25,7 @@ public class Vpc extends TfObject{
 	}  
 	
 	public Vpc(DataVpc dataVpc) {
+		this.dataVpc = dataVpc;
 		this.cidr_block = dataVpc.cidr_block;
 		this.dhcp_options_id = dataVpc.dhcp_options_id;
 		this.enable_dns_hostnames = dataVpc.enable_dns_hostnames ;
@@ -35,6 +38,7 @@ public class Vpc extends TfObject{
 	}
 
 	public Vpc(ResourceVpc resourcsVpc) {
+		this.resourcsVpc = resourcsVpc;
 		this.cidr_block = resourcsVpc.cidr_block;
 		this.dhcp_options_id = resourcsVpc.dhcp_options_id;
 		this.enable_dns_hostnames = resourcsVpc.enable_dns_hostnames ;
@@ -46,10 +50,12 @@ public class Vpc extends TfObject{
 		resource = true;
 	}
 
-	@Override
-	public boolean isResource() {
-		return resource;
+	public DataVpc getDataVpc() {
+		return dataVpc;
 	}
-	
+
+	public ResourceVpc getResourcsVpc() {
+		return resourcsVpc;
+	}
 	
 }

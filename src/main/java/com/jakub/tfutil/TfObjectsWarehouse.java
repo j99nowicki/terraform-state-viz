@@ -188,16 +188,7 @@ public class TfObjectsWarehouse {
 		return matchingAttributes;
 	}
 	
-	public HashMap<String, ResourceVpcEndpoint> findVpcEndpointAttributesInVpc(String idVpc) {
-		HashMap<String, ResourceVpcEndpoint> matchingAttributes = new HashMap<>();
-		for (String id : rVpcEndpoints.keySet()) {
-			ResourceVpcEndpoint attr = rVpcEndpoints.get(id);
-			if (attr.vpc_id.equals(idVpc)){
-				matchingAttributes.put(id, attr);
-			}
-		}
-		return matchingAttributes;
-	}
+
 
 	public HashMap<String, ResourceRouteTable> findRouteTablesAttributesInVpc(String idVpc) {
 		HashMap<String, ResourceRouteTable> matchingAttributes = new HashMap<>();
