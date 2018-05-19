@@ -6,6 +6,7 @@ import java.util.HashSet;
 import com.jakub.tfutil.TfObjectsWarehouse;
 import com.jakub.tfutil.aws.data.DataSubnetIds;
 import com.jakub.tfutil.aws.data.DataVpc;
+import com.jakub.tfutil.aws.objects.Instance;
 import com.jakub.tfutil.aws.objects.InternetGateway;
 import com.jakub.tfutil.aws.objects.Model;
 import com.jakub.tfutil.aws.objects.NatGateway;
@@ -87,7 +88,7 @@ public class GraphvizDiagram{
 "                \""+subnet.id+"\" [label = \"{tfName: "+ subnet.tfName+"|id: "+idSubnet+"|cidr_block: "+subnet.cidr_block+"}\" shape = \"record\" ];\n");
 
 //Instances
-					printRInstances(subnet);	
+					GraphvizInstance.printInstances(diagram, model, subnet.id);	
 //Nat Gw
 					GraphvizNatGateway.printNatGateways(diagram, model, subnet, displayedNatGws);
 //Subnets - end
@@ -148,21 +149,7 @@ public class GraphvizDiagram{
 "            label = \"DSubnetId: "+ idDSubnet+"\"\n"+
 "            \""+idDSubnet+"\" [label = \"{id: "+idDSubnet+"}\" shape = \"record\" ];\n");
 //D Instances 
-						HashMap<String, ResourceInstance> instances = tfObjectsWarehouse.findInstancesInSubnet(idDSubnet);
-						for (String idInstance : instances.keySet()) {
-							ResourceInstance instance = instances.get(idInstance);
-							diagram.append(
-"                subgraph cluster_"+(c++)+" {\n"+
-"                    \"icon-"+idInstance+"\" [label=EC2 shape=rpromoter style=filled]\n"+
-"                    node [style=filled];\n"+
-"                    style=\"filled, rounded\";\n"+
-"                    color=blue\n"+
-"                    label = \"EC2: "+ instance.tagsName+"\"\n"+
-"                    \""+idInstance+"\" [label = \"{tfName: "+ instance.tfName+"|id: "+idInstance+"|public IP: "+instance.public_ip+"|private IP: "+instance.private_ip+"}\" shape = \"record\" ];\n");
-							diagram.append(					
-"                }\n");
-						}
-//D Instances - end
+				GraphvizInstance.printInstances(diagram, model, idDSubnet);	
 
 //D Subnets - end
 						diagram.append(
@@ -279,26 +266,6 @@ public class GraphvizDiagram{
 		}	
 			
 //Route table associations - end
-	}
-
-	private void printRInstances(ResourceSubnet subnet) {
-		HashMap<String, ResourceInstance> instances = tfObjectsWarehouse.findInstancesInSubnet(subnet.id);
-//					System.out.println("vpc: " + idVpc +" zone: " + zone + " subnet: " + idSubnet + " instances: " + instances.size() );
-
-		for (String idInstance : instances.keySet()) {
-			ResourceInstance instance = instances.get(idInstance);
-//						System.out.println("vpc: " + idVpc +" zone: " + zone + " subnet: " + idSubnet + " instance: " +idInstance );
-
-			diagram.append(
-"                subgraph cluster_"+(c++)+" {\n"+
-"                    \"icon-"+instance.id+"\" [label=EC2 shape=rpromoter]\n"+
-"                    node [style=filled];\n"+
-"                    color=blue\n"+
-"                    label = \"EC2: "+ subnet.tagsName+"\"\n"+
-"                    \""+instance.id+"\" [label = \"{tfName: "+ instance.tfName+"|id: "+idInstance+"|public IP: "+instance.public_ip+"|private IP: "+instance.private_ip+"}\" shape = \"record\" ];\n");
-			diagram.append(					
-"                }\n");
-		}
 	}
 
 		

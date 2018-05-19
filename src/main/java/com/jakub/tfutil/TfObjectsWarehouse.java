@@ -134,17 +134,7 @@ public class TfObjectsWarehouse {
 	}
 	
 
-	
-	public HashMap<String, ResourceInstance> findInstancesInSubnet(String idSubnet){
-		HashMap<String, ResourceInstance> matchingAttributes = new HashMap<>();
-		for (String id : rInstances.keySet()) {
-			ResourceInstance attr = rInstances.get(id);
-			if (attr.subnet_id.equals(idSubnet)){
-				matchingAttributes.put(id, attr);
-			}
-		}
-		return matchingAttributes;
-	}	
+
 	
 	public HashMap<String, ResourceRouteTable> findRouteTablesAttributesInVpc(String idVpc) {
 		HashMap<String, ResourceRouteTable> matchingAttributes = new HashMap<>();

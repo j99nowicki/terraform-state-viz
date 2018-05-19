@@ -1,13 +1,17 @@
 package com.jakub.tfutil.aws.objects;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import com.jakub.tfutil.TfObjectsWarehouse;
+import com.jakub.tfutil.aws.data.DataSubnetIds;
 import com.jakub.tfutil.aws.data.DataVpc;
 import com.jakub.tfutil.aws.resources.ResourceEip;
+import com.jakub.tfutil.aws.resources.ResourceInstance;
 import com.jakub.tfutil.aws.resources.ResourceInternetGateway;
 import com.jakub.tfutil.aws.resources.ResourceNatGateway;
+import com.jakub.tfutil.aws.resources.ResourceSubnet;
 import com.jakub.tfutil.aws.resources.ResourceVpc;
 import com.jakub.tfutil.aws.resources.ResourceVpcEndpoint;
 import com.jakub.tfutil.aws.resources.ResourceVpnGateway;
@@ -19,7 +23,8 @@ public class Model {
 	public HashMap<String, InternetGateway> internetGateways = new HashMap<>();
 	public HashMap<String, Eip> eips = new HashMap<>();
 	public HashMap<String, NatGateway> natGateways = new HashMap<>();
-	
+	public HashMap<String, Instance> instances = new HashMap<>();
+	public HashMap<String, Subnet> subnets = new HashMap<>();
 	
 	@Override
 	public String toString()
@@ -61,7 +66,24 @@ public class Model {
 			ResourceNatGateway item = tfObjectsWarehouse.rNatGateways.get(key);
 			natGateways.put(key, new NatGateway(item));
 		}
+		
+		for (String key : tfObjectsWarehouse.rInstances.keySet()) {
+			ResourceInstance item = tfObjectsWarehouse.rInstances.get(key);
+			instances.put(key, new Instance(item));
+		}
 
+		for (String key : tfObjectsWarehouse.rSubnets.keySet()) {
+			ResourceSubnet item = tfObjectsWarehouse.rSubnets.get(key);
+			subnets.put(key, new Subnet(item));
+		}
+		for (String key : tfObjectsWarehouse.dSubnetIdss.keySet()) {
+			DataSubnetIds item = tfObjectsWarehouse.dSubnetIdss.get(key);
+			HashSet<String> ids = item.ids;
+			for (String idSubnet : ids) {
+				subnets.put(key, new Subnet(item.vpc_id, idSubnet));				
+			}
+		}
+				
 	}
 	
 	
@@ -123,4 +145,16 @@ public class Model {
 		return matchingElements;
 	}
 	
+	
+	public HashMap<String, Instance> findInstancesInSubnet(String idSubnet){
+		HashMap<String, Instance> matchingElements = new HashMap<>();
+		for (String id : instances.keySet()) {
+			Instance element = instances.get(id);
+			if (element.subnet_id.equals(idSubnet)){
+				matchingElements.put(id, element);
+			}
+		}
+		return matchingElements;
+	}	
+
 }
