@@ -12,26 +12,15 @@ public class GraphvizVpcEndpoint {
 		for (String idVpcEndpoint : vpcEndpoints.keySet()) {
 			VpcEndpoint vpcEndpoint = vpcEndpoints.get(idVpcEndpoint);
 			allDisplayedVpcEndpoints.put(idVpcEndpoint, vpcEndpoint);
-			if (vpcEndpoint.isResource()){
-				diagram.append(
+			String style = (vpcEndpoint.isResource()?"filled":"dashed");
+			diagram.append(
 "            subgraph cluster_"+(GraphvizDiagram.c++)+" {\n"+
-"                \"icon"+vpcEndpoint.id+"\" [label=\"R VPC Endpoint\" shape=cds]\n"+
+"                \"icon"+vpcEndpoint.id+"\" [label=\"VPC Endpoint\" shape=cds]\n"+
 "                node [style=filled];\n"+
 "                color=orchid1\n"+
-"                style=\"filled,rounded\" label = \"R VPC Endpoint: "+ vpcEndpoint.vpc_endpoint_type+"\"\n"+
+"                style=\""+style+",rounded\" label = \"VPC Endpoint: "+ vpcEndpoint.vpc_endpoint_type+"\"\n"+
 "                \""+idVpcEndpoint+"\" [label = \"{tfName: "+ vpcEndpoint.tfName+"|id: "+idVpcEndpoint+"|service_name: "+vpcEndpoint.service_name+"}\" shape = \"record\" ];\n"+
 "            }\n");
-			} else {
-				diagram.append(
-"            subgraph cluster_"+(GraphvizDiagram.c++)+" {\n"+
-"                \"icon"+vpcEndpoint.id+"\" [label=\"D VPC Endpoint\" shape=cds]\n"+
-"                node [style=dashed];\n"+
-"                color=orchid1\n"+
-"                style=\"dashed,rounded\" label = \"D VPC Endpoint: "+ vpcEndpoint.vpc_endpoint_type+"\"\n"+
-"                \""+idVpcEndpoint+"\" [label = \"{tfName: "+ vpcEndpoint.tfName+"|id: "+idVpcEndpoint+"|service_name: "+vpcEndpoint.service_name+"}\" shape = \"record\" ];\n"+
-"            }\n");
-				
-			}
 		}
 	}
 }

@@ -133,16 +133,7 @@ public class TfObjectsWarehouse {
 		return matchingAttributes;
 	}
 	
-	public HashMap<String, ResourceNatGateway> findNatGatewaysAttributesInSubnet(String idSubnet){
-		HashMap<String, ResourceNatGateway> matchingAttributes = new HashMap<>();
-		for (String id : rNatGateways.keySet()) {
-			ResourceNatGateway attr = rNatGateways.get(id);
-			if (attr.subnet_id.equals(idSubnet)){
-				matchingAttributes.put(id, attr);
-			}
-		}
-		return matchingAttributes;
-	}
+
 	
 	public HashMap<String, ResourceInstance> findInstancesInSubnet(String idSubnet){
 		HashMap<String, ResourceInstance> matchingAttributes = new HashMap<>();
@@ -154,17 +145,6 @@ public class TfObjectsWarehouse {
 		}
 		return matchingAttributes;
 	}	
-	
-	public ResourceEip findEipAttributes(String idEip){
-		ResourceEip eipAttributes = null;
-		for (String id : rEips.keySet()) {
-			eipAttributes = rEips.get(id);
-			if (eipAttributes.id.equals(idEip)){
-				return eipAttributes;
-			}
-		}
-		return null;
-	}
 	
 	public HashMap<String, ResourceRouteTable> findRouteTablesAttributesInVpc(String idVpc) {
 		HashMap<String, ResourceRouteTable> matchingAttributes = new HashMap<>();

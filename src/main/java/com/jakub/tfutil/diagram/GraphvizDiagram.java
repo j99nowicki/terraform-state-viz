@@ -8,13 +8,11 @@ import com.jakub.tfutil.aws.data.DataSubnetIds;
 import com.jakub.tfutil.aws.data.DataVpc;
 import com.jakub.tfutil.aws.objects.InternetGateway;
 import com.jakub.tfutil.aws.objects.Model;
+import com.jakub.tfutil.aws.objects.NatGateway;
 import com.jakub.tfutil.aws.objects.Vpc;
 import com.jakub.tfutil.aws.objects.VpcEndpoint;
 import com.jakub.tfutil.aws.objects.VpnGateway;
-import com.jakub.tfutil.aws.resources.ResourceEip;
 import com.jakub.tfutil.aws.resources.ResourceInstance;
-import com.jakub.tfutil.aws.resources.ResourceInternetGateway;
-import com.jakub.tfutil.aws.resources.ResourceNatGateway;
 import com.jakub.tfutil.aws.resources.ResourceRoute;
 import com.jakub.tfutil.aws.resources.ResourceRouteTableAssociation;
 import com.jakub.tfutil.aws.resources.ResourceRouteTable;
@@ -29,7 +27,7 @@ public class GraphvizDiagram{
 	private HashMap<String, InternetGateway> allDisplayedIgws = new HashMap<String, InternetGateway>();
 	private HashMap<String, VpnGateway> allDisplayedVpnGws = new HashMap<String, VpnGateway>();
 	private HashMap<String, VpcEndpoint> allDisplayedVpcEndpoints = new HashMap<String, VpcEndpoint>();
-	private HashMap<String, ResourceNatGateway> displayedNatGws = new HashMap<String, ResourceNatGateway>();
+	private HashMap<String, NatGateway> displayedNatGws = new HashMap<String, NatGateway>();
 	private HashSet<String> allDisplayedZones = new HashSet<String>();
 	private TfObjectsWarehouse tfObjectsWarehouse = null;
 	
@@ -91,7 +89,7 @@ public class GraphvizDiagram{
 //Instances
 					printRInstances(subnet);	
 //Nat Gw
-					printRNatGateways(subnet);
+					GraphvizNatGateway.printNatGateways(diagram, model, subnet, displayedNatGws);
 //Subnets - end
 					diagram.append(						
 "            }\n");
@@ -303,31 +301,7 @@ public class GraphvizDiagram{
 		}
 	}
 
-	
-	
-	
-	
-	private void printRNatGateways(ResourceSubnet subnet) {
-		HashMap<String, ResourceNatGateway> natGws = tfObjectsWarehouse.findNatGatewaysAttributesInSubnet(subnet.id);
-		for (String idNatGw : natGws.keySet()) {
-			ResourceNatGateway natGw = natGws.get(idNatGw);
-			displayedNatGws.put(idNatGw, natGw);
-			diagram.append(
-"                subgraph cluster_"+(c++)+" {\n"+
-"                    \"icon-"+natGw.id+"\" [label=\"R NatGW\" shape=rpromoter]\n"+
-"                    node [style=filled];\n"+
-"                    color=salmon\n"+
-"                    label = \"Nat GW: "+ subnet.tagsName+"\"\n"+
-"                    \""+idNatGw+"\" [label = \"{tfName: "+ natGw.tfName+"|id: "+idNatGw+"|public IP: "+natGw.public_ip+"|private IP: "+natGw.private_ip+"}\" shape = \"record\" ];\n");
-//Eip
-			ResourceEip eipAttributes = tfObjectsWarehouse.findEipAttributes(natGw.allocation_id);
-			diagram.append(			
-"                    \"icon-"+eipAttributes.id+"\" [label=\"RElastic IP\" shape=house color=yellow]\n");
-			diagram.append(					
-"                }\n");
-		}
-	}
-
+		
 	private void printGateways(String idVpc) {
 		diagram.append(
 "        subgraph cluster_"+(c++)+" {\n"+
