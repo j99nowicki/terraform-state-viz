@@ -1,7 +1,6 @@
 package com.jakub.tfutil;
 
 import java.util.HashMap;
-import java.util.HashSet;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -66,57 +65,6 @@ public class TfObjectsWarehouse {
 	public String sufixFrom(String key){
 		return key.substring(key.indexOf(".")+1, key.length());
 	}
-	
-	public ResourceSubnet findSubnetAttributes(String idSubnet){
-		for (String id : rSubnets.keySet()) {
-			ResourceSubnet attr = rSubnets.get(id);
-			if (attr.id.equals(idSubnet)){
-				return rSubnets.get(id);
-			}
-		}
-		return null;
-	}
-	
-	public ResourceRouteTable findRouteTableAttributes(String idRouteTable){
-		for (String id : rRouteTables.keySet()) {
-			ResourceRouteTable attr = rRouteTables.get(id);
-			if (attr.id.equals(idRouteTable)){
-				return rRouteTables.get(id);
-			}
-		}
-		return null;
-	}
-	public HashMap<String, ResourceRoute> findRoutesAttributesInTable(String idRouteTable){
-		HashMap<String, ResourceRoute> matchingAttributes = new HashMap<>();
-		for (String id : rRoutes.keySet()) {
-			ResourceRoute attr = rRoutes.get(id);
-			if (attr.route_table_id.equals(idRouteTable)){
-				matchingAttributes.put(attr.id, attr);
-			}
-		}
-		return matchingAttributes;
-	}
 
-	public HashMap<String, ResourceRouteTable> findRouteTablesAttributesInVpc(String idVpc) {
-		HashMap<String, ResourceRouteTable> matchingAttributes = new HashMap<>();
-		for (String id : rRouteTables.keySet()) {
-			ResourceRouteTable attr = rRouteTables.get(id);
-			if (attr.vpc_id.equals(idVpc)){
-				matchingAttributes.put(id, attr);
-			}
-		}
-		return matchingAttributes;
-	}
-
-	public HashMap<String, ResourceRouteTableAssociation> findRouteTablesAssociationAttributesForRouteTables(String idRouteTable) {
-		HashMap<String, ResourceRouteTableAssociation> matchingAttributes = new HashMap<>();
-		for (String id : rRouteTableAssociations.keySet()) {
-			ResourceRouteTableAssociation attr = rRouteTableAssociations.get(id);
-			if (attr.route_table_id.equals(idRouteTable)){
-				matchingAttributes.put(id, attr);
-			}
-		}
-		return matchingAttributes;
-	}
 	
 }

@@ -11,6 +11,9 @@ import com.jakub.tfutil.aws.resources.ResourceEip;
 import com.jakub.tfutil.aws.resources.ResourceInstance;
 import com.jakub.tfutil.aws.resources.ResourceInternetGateway;
 import com.jakub.tfutil.aws.resources.ResourceNatGateway;
+import com.jakub.tfutil.aws.resources.ResourceRoute;
+import com.jakub.tfutil.aws.resources.ResourceRouteTable;
+import com.jakub.tfutil.aws.resources.ResourceRouteTableAssociation;
 import com.jakub.tfutil.aws.resources.ResourceSubnet;
 import com.jakub.tfutil.aws.resources.ResourceVpc;
 import com.jakub.tfutil.aws.resources.ResourceVpcEndpoint;
@@ -25,6 +28,9 @@ public class Model {
 	public HashMap<String, NatGateway> natGateways = new HashMap<>();
 	public HashMap<String, Instance> instances = new HashMap<>();
 	public HashMap<String, Subnet> subnets = new HashMap<>();
+	public HashMap<String, Route> routes = new HashMap<>();
+	public HashMap<String, RouteTableAssociation> routeTableAssociations = new HashMap<>();
+	public HashMap<String, RouteTable> routeTables = new HashMap<>();
 	
 	@Override
 	public String toString()
@@ -93,6 +99,21 @@ public class Model {
 		for (String idVpc : vpcs.keySet()) {
 			vpcs.get(idVpc).setAvailabilityZones(findAvailabilityZonesInVpc(idVpc));
 		}	
+		
+		for (String key : tfObjectsWarehouse.rRoutes.keySet()){
+			ResourceRoute item = tfObjectsWarehouse.rRoutes.get(key);
+			routes.put(key, new Route(item));
+		}
+
+		for (String key : tfObjectsWarehouse.rRouteTableAssociations.keySet()){
+			ResourceRouteTableAssociation item = tfObjectsWarehouse.rRouteTableAssociations.get(key);
+			routeTableAssociations.put(key, new RouteTableAssociation(item));
+		}
+		
+		for (String key : tfObjectsWarehouse.rRouteTables.keySet()){
+			ResourceRouteTable item = tfObjectsWarehouse.rRouteTables.get(key);
+			routeTables.put(key, new RouteTable(item));
+		}
 		
 	}
 
@@ -196,5 +217,37 @@ public class Model {
 		return matchingElements;
 	}
 
+	public HashMap<String, Route> findRoutesInTable(String idRouteTable){
+		HashMap<String, Route> matchingElements = new HashMap<>();
+		for (String id : routes.keySet()) {
+			Route element = routes.get(id);
+			if (element.route_table_id.equals(idRouteTable)){
+				matchingElements.put(element.id, element);
+			}
+		}
+		return matchingElements;
+	}	
+	
+	public HashMap<String, RouteTableAssociation> findRouteTablesAssociationForRouteTable(String idRouteTable) {
+		HashMap<String, RouteTableAssociation> matchingElements = new HashMap<>();
+		for (String id : routeTableAssociations.keySet()) {
+			RouteTableAssociation item = routeTableAssociations.get(id);
+			if (item.route_table_id.equals(idRouteTable)){
+				matchingElements.put(id, item);
+			}
+		}
+		return matchingElements;
+	}
+	
+	public HashMap<String, RouteTable> findRouteTablesInVpc(String idVpc) {
+		HashMap<String, RouteTable> matchingElements = new HashMap<>();
+		for (String id : routeTables.keySet()) {
+			RouteTable element = routeTables.get(id);
+			if (element.vpc_id.equals(idVpc)){
+				matchingElements.put(id, element);
+			}
+		}
+		return matchingElements;
+	}
 	
 }
