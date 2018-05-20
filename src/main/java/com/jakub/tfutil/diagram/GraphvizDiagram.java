@@ -18,6 +18,7 @@ public class GraphvizDiagram{
 	static boolean showRouteTablesAssociationsToSubnets = true;
 	static boolean showRouteTablesAssociationsToVpcEndpoints = true;
 	static boolean showInternalRoutesToGateways = true;
+	static boolean showVpcDhcpOptions = true;
 	
 	private StringBuffer diagram = new StringBuffer();
 	static int c=0;
@@ -70,7 +71,11 @@ public class GraphvizDiagram{
 //Route tables
 			if (showRouteTables){
 				GraphvizRouteTable.printRouteTables(diagram, model, idVpc, allDisplayedZonesInVpc);
-			}			
+			}
+			if (showVpcDhcpOptions){
+				GraphvizVpcDhcpOptions.printVpcDhcpOptions(diagram, model, idVpc);
+			}
+			
 //Vpc - end
 			diagram.append(				
 "    }\n");

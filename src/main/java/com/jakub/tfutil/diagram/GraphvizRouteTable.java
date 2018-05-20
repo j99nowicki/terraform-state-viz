@@ -8,8 +8,8 @@ import com.jakub.tfutil.aws.objects.RouteTable;
 
 public class GraphvizRouteTable {
 	
-	public static void printRouteTables(StringBuffer diagram, Model model, String idRVpc, HashSet<String> allDisplayedZonesInVpc) {
-		HashMap<String, RouteTable> routeTables = model.findRouteTablesInVpc(idRVpc);
+	public static void printRouteTables(StringBuffer diagram, Model model, String idVpc, HashSet<String> allDisplayedZonesInVpc) {
+		HashMap<String, RouteTable> routeTables = model.findRouteTablesInVpc(idVpc);
 		for (String idRouteTable : routeTables.keySet()) {
 			RouteTable routeTable = routeTables.get(idRouteTable);
 			diagram.append(

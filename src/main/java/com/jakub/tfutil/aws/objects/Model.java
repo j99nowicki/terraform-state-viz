@@ -2,6 +2,7 @@ package com.jakub.tfutil.aws.objects;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap.KeySetView;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import com.jakub.tfutil.TfObjectsWarehouse;
@@ -16,6 +17,8 @@ import com.jakub.tfutil.aws.resources.ResourceRouteTable;
 import com.jakub.tfutil.aws.resources.ResourceRouteTableAssociation;
 import com.jakub.tfutil.aws.resources.ResourceSubnet;
 import com.jakub.tfutil.aws.resources.ResourceVpc;
+import com.jakub.tfutil.aws.resources.ResourceVpcDhcpOptions;
+import com.jakub.tfutil.aws.resources.ResourceVpcDhcpOptionsAssociation;
 import com.jakub.tfutil.aws.resources.ResourceVpcEndpoinRouteTableAssociation;
 import com.jakub.tfutil.aws.resources.ResourceVpcEndpoint;
 import com.jakub.tfutil.aws.resources.ResourceVpnGateway;
@@ -33,6 +36,8 @@ public class Model {
 	public HashMap<String, RouteTableAssociation> routeTableAssociations = new HashMap<>();
 	public HashMap<String, RouteTable> routeTables = new HashMap<>();
 	public HashMap<String, VpcEndpoinRouteTableAssociation> vpcEndpoinRouteTableAssociation = new HashMap<>();
+	public HashMap<String, VpcDhcpOptions> vpcDhcpOptionss = new HashMap<>();
+	public HashMap<String, VpcDhcpOptionsAssociation> vpcDhcpOptionsAssociations = new HashMap<>();
 	
 	@Override
 	public String toString()
@@ -121,6 +126,16 @@ public class Model {
 			ResourceVpcEndpoinRouteTableAssociation item = tfObjectsWarehouse.rVpcEndpoinRouteTableAssociations.get(key);
 			vpcEndpoinRouteTableAssociation.put(key, new VpcEndpoinRouteTableAssociation(item));
 		}
+		
+		for (String key : tfObjectsWarehouse.rVpcDhcpOptionss.keySet()){
+			ResourceVpcDhcpOptions item = tfObjectsWarehouse.rVpcDhcpOptionss.get(key);
+			vpcDhcpOptionss.put(key, new VpcDhcpOptions(item));
+		}
+		
+		for (String key : tfObjectsWarehouse.rVpcDhcpOptionsAssociations.keySet()){
+			ResourceVpcDhcpOptionsAssociation item = tfObjectsWarehouse.rVpcDhcpOptionsAssociations.get(key);
+			vpcDhcpOptionsAssociations.put(key, new VpcDhcpOptionsAssociation(item));
+		}		
 				
 	}
 
@@ -266,6 +281,20 @@ public class Model {
 			}
 		}
 		return matchingElements;
+	}
+		
+	public HashMap<String, VpcDhcpOptions> findVpcDhcpOptionsInVpc(String idVpc){
+		HashMap<String, VpcDhcpOptions> matchingElements = new HashMap<>();
+		for (String idVpcDhcpOptions : vpcDhcpOptionss.keySet()) {
+			VpcDhcpOptions vpcDhcpOptions = vpcDhcpOptionss.get(idVpcDhcpOptions);
+			for (String idVpcDhcpOptionsAssociation : vpcDhcpOptionsAssociations.keySet()) {
+				if (idVpc.equals(vpcDhcpOptionsAssociations.get(idVpcDhcpOptionsAssociation).vpc_id) &&
+					idVpcDhcpOptions.equals(vpcDhcpOptionsAssociations.get(idVpcDhcpOptionsAssociation).dhcp_options_id)){
+					matchingElements.put(idVpcDhcpOptions, vpcDhcpOptions);
+				}
+			}
+		}
+		return matchingElements;		
 	}
 	
 }

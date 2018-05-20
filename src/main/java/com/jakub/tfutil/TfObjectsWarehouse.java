@@ -17,6 +17,8 @@ import com.jakub.tfutil.aws.resources.ResourceSecurityGroup;
 import com.jakub.tfutil.aws.resources.ResourceSecurityGroupRule;
 import com.jakub.tfutil.aws.resources.ResourceSubnet;
 import com.jakub.tfutil.aws.resources.ResourceVpc;
+import com.jakub.tfutil.aws.resources.ResourceVpcDhcpOptions;
+import com.jakub.tfutil.aws.resources.ResourceVpcDhcpOptionsAssociation;
 import com.jakub.tfutil.aws.resources.ResourceVpcEndpoinRouteTableAssociation;
 import com.jakub.tfutil.aws.resources.ResourceVpcEndpoint;
 import com.jakub.tfutil.aws.resources.ResourceVpnGateway;
@@ -36,6 +38,8 @@ public class TfObjectsWarehouse {
 	public HashMap<String, ResourceSecurityGroupRule> rSecurityGroupRules;
 	public HashMap<String, ResourceInstance> rInstances;
 	public HashMap<String, ResourceVpcEndpoinRouteTableAssociation> rVpcEndpoinRouteTableAssociations;
+	public HashMap<String, ResourceVpcDhcpOptions> rVpcDhcpOptionss;
+	public HashMap<String, ResourceVpcDhcpOptionsAssociation> rVpcDhcpOptionsAssociations;
 
 	public HashMap<String, DataSubnetIds> dSubnetIdss;
 	public HashMap<String, DataVpc> dVpcs;
@@ -55,6 +59,8 @@ public class TfObjectsWarehouse {
 		this.rSecurityGroupRules = new HashMap<>();
 		this.rInstances = new HashMap<>();
 		this.rVpcEndpoinRouteTableAssociations = new HashMap<>(); 
+		this.rVpcDhcpOptionss = new HashMap<>();
+		this.rVpcDhcpOptionsAssociations = new HashMap<>();
 
 		this.dSubnetIdss = new HashMap<>();
 		this.dVpcs = new HashMap<>();

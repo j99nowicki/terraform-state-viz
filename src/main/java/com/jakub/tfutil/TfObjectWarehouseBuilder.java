@@ -27,6 +27,8 @@ import com.jakub.tfutil.aws.resources.ResourceSecurityGroup;
 import com.jakub.tfutil.aws.resources.ResourceSecurityGroupRule;
 import com.jakub.tfutil.aws.resources.ResourceSubnet;
 import com.jakub.tfutil.aws.resources.ResourceVpc;
+import com.jakub.tfutil.aws.resources.ResourceVpcDhcpOptions;
+import com.jakub.tfutil.aws.resources.ResourceVpcDhcpOptionsAssociation;
 import com.jakub.tfutil.aws.resources.ResourceVpcEndpoinRouteTableAssociation;
 import com.jakub.tfutil.aws.resources.ResourceVpcEndpoint;
 import com.jakub.tfutil.aws.resources.ResourceVpnGateway;
@@ -156,6 +158,14 @@ public class TfObjectWarehouseBuilder{
 					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceVpcEndpoinRouteTableAssociation.class);
 					tfAttr.tfName = tfName;
 					tfObjectsWarehouse.rVpcEndpoinRouteTableAssociations.put(objectKey, (ResourceVpcEndpoinRouteTableAssociation) tfAttr);
+				} else if ("aws_vpc_dhcp_options".equals(type)) {
+					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceVpcDhcpOptions.class);
+					tfAttr.tfName = tfName;
+					tfObjectsWarehouse.rVpcDhcpOptionss.put(objectKey, (ResourceVpcDhcpOptions) tfAttr);
+				} else if ("aws_vpc_dhcp_options_association".equals(type)) {
+					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceVpcDhcpOptionsAssociation.class);
+					tfAttr.tfName = tfName;
+					tfObjectsWarehouse.rVpcDhcpOptionsAssociations.put(objectKey, (ResourceVpcDhcpOptionsAssociation) tfAttr);
 				} else {
 					System.out.println("Unknown respource type: " + type);
 				}
