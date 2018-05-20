@@ -8,25 +8,6 @@ import com.jakub.tfutil.aws.objects.VpnGateway;
 
 public class GraphvizSubnet {
 	
-	public static void printVpnGateways(StringBuffer diagram, Model model, String idVpc, HashMap<String, VpnGateway> allDisplayedVpnGws) {
-		HashMap<String, VpnGateway> vpnGws = model.findVpnGatewaysInVpc(idVpc);
-		for (String idVpnGw : vpnGws.keySet()) {
-			VpnGateway vpnGw = vpnGws.get(idVpnGw);
-			allDisplayedVpnGws.put(idVpnGw, vpnGw);
-			String style = (vpnGw.isResource()?"filled":"dashed");
-			diagram.append(
-"            subgraph cluster_"+(GraphvizDiagram.c++)+" {\n"+
-"                \"icon"+vpnGw.id+"\" [label=\"VPN GW\" shape=cds]\n"+
-"                node [style=filled];\n"+
-"                color=royalblue1\n"+
-"                style=\""+style+",rounded\" label = \"VPN GW: "+ vpnGw.tagsName+"\"\n"+
-"                \""+idVpnGw+"\" [label = \"{tfName: "+ vpnGw.tfName+"|id: "+idVpnGw+"|amazon side ASN: "+vpnGw.amazon_side_asn+"}\" shape = \"record\" ];\n"+
-"            }\n");
-		}
-	}
-	
-	
-	
 	public static void printSubnets(StringBuffer diagram, Model model, String idVpc, String zone) {
 //Subnets		
 		HashMap<String, Subnet> subnets = model.findSubnetsInVpcInZone(idVpc, zone);
@@ -38,6 +19,7 @@ public class GraphvizSubnet {
 "            subgraph cluster_"+(GraphvizDiagram.c++)+" {\n"+
 "                node [style=filled];\n"+
 "                color=green\n"+
+"                penwidth=1\n"+
 "                style=\""+style+",rounded\"\n");
 			if (subnet.isResource()){
 				diagram.append(

@@ -10,7 +10,8 @@ public class GraphvizAvailiabilityZone {
 "        subgraph cluster_"+(GraphvizDiagram.c++)+" {\n"+
 "            node [style=filled];\n"+
 "            style=\"dashed,rounded\";\n"+
-"            color=turquoise\n"+
+"            color=darkorange3\n"+
+"            penwidth=5\n"+
 "            label = \"Availability zone: "+ zone +"\"\n" +
 "            \""+zone+idVpc+"\" [label = \"{}\" style=invisible ];\n");
 					
