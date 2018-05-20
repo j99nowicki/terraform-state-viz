@@ -11,7 +11,7 @@ public class GraphvizRouteTableAssociation {
 	
 	public static void printAssociationsAndRoutes(StringBuffer diagram, Model model, String idRouteTable, HashSet<String> allDisplayedZonesInVpc) {
 		//Route table associations - find all associations for given table
-		HashMap<String, RouteTableAssociation> routeTableAssociations = model.findRouteTablesAssociationForRouteTable(idRouteTable);
+		HashMap<String, RouteTableAssociation> routeTableAssociations = model.findRouteTablesAssociationsForRouteTable(idRouteTable);
 		
 		for (String idRouteTableAssociation : routeTableAssociations.keySet()) {
 			RouteTableAssociation routeTableAssociation = routeTableAssociations.get(idRouteTableAssociation);
@@ -20,7 +20,7 @@ public class GraphvizRouteTableAssociation {
 				String idSubnet = subnet.id;
 				
 				if (GraphvizDiagram.showRouteTablesAssociationsToSubnets){
-					diagram.append("        \""+idSubnet+"\" -> \""+ idRouteTable +"\" [label = \""+idRouteTableAssociation+"\" dir=none, style=dashed]\n");
+					diagram.append("        \""+ idRouteTable +"\" -> \""+ idSubnet +"\" [label = \""+idRouteTableAssociation+"\" dir=none, style=dashed]\n");
 				}
 				if (GraphvizDiagram.showInternalRoutesToGateways){
 					GraphvizRoute.printRoute(diagram, model, idRouteTable, idSubnet);

@@ -16,6 +16,7 @@ import com.jakub.tfutil.aws.resources.ResourceRouteTable;
 import com.jakub.tfutil.aws.resources.ResourceRouteTableAssociation;
 import com.jakub.tfutil.aws.resources.ResourceSubnet;
 import com.jakub.tfutil.aws.resources.ResourceVpc;
+import com.jakub.tfutil.aws.resources.ResourceVpcEndpoinRouteTableAssociation;
 import com.jakub.tfutil.aws.resources.ResourceVpcEndpoint;
 import com.jakub.tfutil.aws.resources.ResourceVpnGateway;
 
@@ -31,6 +32,7 @@ public class Model {
 	public HashMap<String, Route> routes = new HashMap<>();
 	public HashMap<String, RouteTableAssociation> routeTableAssociations = new HashMap<>();
 	public HashMap<String, RouteTable> routeTables = new HashMap<>();
+	public HashMap<String, VpcEndpoinRouteTableAssociation> vpcEndpoinRouteTableAssociation = new HashMap<>();
 	
 	@Override
 	public String toString()
@@ -115,6 +117,11 @@ public class Model {
 			routeTables.put(key, new RouteTable(item));
 		}
 		
+		for (String key : tfObjectsWarehouse.rVpcEndpoinRouteTableAssociations.keySet()){
+			ResourceVpcEndpoinRouteTableAssociation item = tfObjectsWarehouse.rVpcEndpoinRouteTableAssociations.get(key);
+			vpcEndpoinRouteTableAssociation.put(key, new VpcEndpoinRouteTableAssociation(item));
+		}
+				
 	}
 
 	private HashSet<String> findAvailabilityZonesInVpc(String idVpc){
@@ -228,7 +235,7 @@ public class Model {
 		return matchingElements;
 	}	
 	
-	public HashMap<String, RouteTableAssociation> findRouteTablesAssociationForRouteTable(String idRouteTable) {
+	public HashMap<String, RouteTableAssociation> findRouteTablesAssociationsForRouteTable(String idRouteTable) {
 		HashMap<String, RouteTableAssociation> matchingElements = new HashMap<>();
 		for (String id : routeTableAssociations.keySet()) {
 			RouteTableAssociation item = routeTableAssociations.get(id);
@@ -245,6 +252,17 @@ public class Model {
 			RouteTable element = routeTables.get(id);
 			if (element.vpc_id.equals(idVpc)){
 				matchingElements.put(id, element);
+			}
+		}
+		return matchingElements;
+	}
+	
+	public HashMap<String, VpcEndpoinRouteTableAssociation> findVpcEndpoinRouteTableAssociationsForRouteTable(String idRouteTable) {
+		HashMap<String, VpcEndpoinRouteTableAssociation> matchingElements = new HashMap<>();
+		for (String id : vpcEndpoinRouteTableAssociation.keySet()) {
+			VpcEndpoinRouteTableAssociation item = vpcEndpoinRouteTableAssociation.get(id);
+			if (item.route_table_id.equals(idRouteTable)){
+				matchingElements.put(id, item);
 			}
 		}
 		return matchingElements;

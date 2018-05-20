@@ -28,6 +28,7 @@ import com.jakub.tfutil.aws.resources.ResourceSecurityGroup;
 import com.jakub.tfutil.aws.resources.ResourceSecurityGroupRule;
 import com.jakub.tfutil.aws.resources.ResourceSubnet;
 import com.jakub.tfutil.aws.resources.ResourceVpc;
+import com.jakub.tfutil.aws.resources.ResourceVpcEndpoinRouteTableAssociation;
 import com.jakub.tfutil.aws.resources.ResourceVpcEndpoint;
 import com.jakub.tfutil.aws.resources.ResourceVpnGateway;
 import com.jakub.tfutil.diagram.GraphvizDiagram;
@@ -168,6 +169,10 @@ public class TerraformStateViz{
 					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceVpc.class);
 					tfAttr.tfName = tfName;
 					tfObjectsWarehouse.rVpcs.put(objectKey, (ResourceVpc) tfAttr);
+				} else if ("aws_vpc_endpoint_route_table_association".equals(type)) {
+					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceVpcEndpoinRouteTableAssociation.class);
+					tfAttr.tfName = tfName;
+					tfObjectsWarehouse.rVpcEndpoinRouteTableAssociations.put(objectKey, (ResourceVpcEndpoinRouteTableAssociation) tfAttr);
 				} else {
 					System.out.println("Unknown respource type: " + type);
 				}

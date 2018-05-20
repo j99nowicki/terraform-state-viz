@@ -21,6 +21,10 @@ public class GraphvizRouteTable {
 "        }\n");
 
 			GraphvizRouteTableAssociation.printAssociationsAndRoutes(diagram, model, idRouteTable, allDisplayedZonesInVpc);
+
+			if (GraphvizDiagram.showRouteTablesAssociationsToVpcEndpoints){
+				GraphvizVpcEndpointRouteTableAssociation.printVpcEndpointRouteTableAssociations(diagram, model, idRouteTable);
+			}
 		}			
 	}
 	

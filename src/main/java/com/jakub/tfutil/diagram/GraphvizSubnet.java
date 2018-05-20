@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import com.jakub.tfutil.aws.objects.Model;
 import com.jakub.tfutil.aws.objects.Subnet;
-import com.jakub.tfutil.aws.objects.VpnGateway;
 
 public class GraphvizSubnet {
 	

@@ -16,6 +16,7 @@ public class GraphvizDiagram{
 	private boolean showRouteTables = true;
 	private boolean showExternals = true;
 	static boolean showRouteTablesAssociationsToSubnets = true;
+	static boolean showRouteTablesAssociationsToVpcEndpoints = true;
 	static boolean showInternalRoutesToGateways = true;
 	
 	private StringBuffer diagram = new StringBuffer();
