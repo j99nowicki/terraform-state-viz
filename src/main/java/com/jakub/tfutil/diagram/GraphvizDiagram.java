@@ -19,6 +19,10 @@ public class GraphvizDiagram{
 	static boolean showRouteTablesAssociationsToVpcEndpoints = true;
 	static boolean showInternalRoutesToGateways = true;
 	static boolean showVpcDhcpOptions = true;
+	private static boolean showElasticacheSubnetGroup = true;
+	private static boolean showRedshiftSubnetGroup = true;
+	static boolean showElasticacheSubnetGroupAssociationsToSubnets = true;
+	static boolean showRedshiftSubnetGroupAssociationsToSubnets = true;
 	
 	private StringBuffer diagram = new StringBuffer();
 	static int c=0;
@@ -75,7 +79,14 @@ public class GraphvizDiagram{
 			if (showVpcDhcpOptions){
 				GraphvizVpcDhcpOptions.printVpcDhcpOptions(diagram, model, idVpc);
 			}
-			
+
+//Subnet groups
+			if (showElasticacheSubnetGroup){
+				GraphvizElasticacheSubnetGroup.printElasticacheSubnetGroup(diagram, model, idVpc, allDisplayedZonesInVpc);
+			}			
+			if (showRedshiftSubnetGroup){
+				GraphvizRedshiftSubnetGroup.printRedshiftSubnetGroup(diagram, model, idVpc, allDisplayedZonesInVpc);
+			}				
 //Vpc - end
 			diagram.append(				
 "    }\n");

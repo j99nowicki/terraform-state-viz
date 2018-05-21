@@ -8,9 +8,11 @@ import com.jakub.tfutil.aws.data.DataAmi;
 import com.jakub.tfutil.aws.data.DataSubnetIds;
 import com.jakub.tfutil.aws.data.DataVpc;
 import com.jakub.tfutil.aws.resources.ResourceEip;
+import com.jakub.tfutil.aws.resources.ResourceElasticacheSubnetGroup;
 import com.jakub.tfutil.aws.resources.ResourceInstance;
 import com.jakub.tfutil.aws.resources.ResourceInternetGateway;
 import com.jakub.tfutil.aws.resources.ResourceNatGateway;
+import com.jakub.tfutil.aws.resources.ResourceRedshiftSubnetGroup;
 import com.jakub.tfutil.aws.resources.ResourceRoute;
 import com.jakub.tfutil.aws.resources.ResourceRouteTableAssociation;
 import com.jakub.tfutil.aws.resources.ResourceRouteTable;
@@ -41,7 +43,10 @@ public class TfObjectsWarehouse {
 	public HashMap<String, ResourceVpcEndpoinRouteTableAssociation> rVpcEndpoinRouteTableAssociations;
 	public HashMap<String, ResourceVpcDhcpOptions> rVpcDhcpOptionss;
 	public HashMap<String, ResourceVpcDhcpOptionsAssociation> rVpcDhcpOptionsAssociations;
-
+	public HashMap<String, ResourceElasticacheSubnetGroup> rElasticacheSubnetGroups;
+	public HashMap<String, ResourceRedshiftSubnetGroup> rRedshiftSubnetGroups;
+	
+	
 	public HashMap<String, DataSubnetIds> dSubnetIdss;
 	public HashMap<String, DataVpc> dVpcs;
 	public HashMap<String, DataAmi> dAmis;
@@ -63,6 +68,8 @@ public class TfObjectsWarehouse {
 		this.rVpcEndpoinRouteTableAssociations = new HashMap<>(); 
 		this.rVpcDhcpOptionss = new HashMap<>();
 		this.rVpcDhcpOptionsAssociations = new HashMap<>();
+		this.rElasticacheSubnetGroups = new HashMap<>();
+		this.rRedshiftSubnetGroups = new HashMap<>();
 
 		this.dSubnetIdss = new HashMap<>();
 		this.dVpcs = new HashMap<>();

@@ -18,9 +18,11 @@ import com.jakub.tfutil.aws.data.DataAmi;
 import com.jakub.tfutil.aws.data.DataSubnetIds;
 import com.jakub.tfutil.aws.data.DataVpc;
 import com.jakub.tfutil.aws.resources.ResourceEip;
+import com.jakub.tfutil.aws.resources.ResourceElasticacheSubnetGroup;
 import com.jakub.tfutil.aws.resources.ResourceInstance;
 import com.jakub.tfutil.aws.resources.ResourceInternetGateway;
 import com.jakub.tfutil.aws.resources.ResourceNatGateway;
+import com.jakub.tfutil.aws.resources.ResourceRedshiftSubnetGroup;
 import com.jakub.tfutil.aws.resources.ResourceRoute;
 import com.jakub.tfutil.aws.resources.ResourceRouteTableAssociation;
 import com.jakub.tfutil.aws.resources.ResourceRouteTable;
@@ -171,6 +173,16 @@ public class TfObjectWarehouseBuilder{
 					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceVpcDhcpOptionsAssociation.class);
 					tfAttr.tfName = tfName;
 					tfObjectsWarehouse.rVpcDhcpOptionsAssociations.put(objectKey, (ResourceVpcDhcpOptionsAssociation) tfAttr);
+				} else if ("aws_elasticache_subnet_group".equals(type)) {
+					ResourceElasticacheSubnetGroup tfAttr = gson.fromJson(jsonElement, ResourceElasticacheSubnetGroup.class);
+					tfAttr.tfName = tfName;
+					tfAttr.parseIds(jsonElement.getAsJsonObject().entrySet());
+					tfObjectsWarehouse.rElasticacheSubnetGroups.put(objectKey, (ResourceElasticacheSubnetGroup) tfAttr);
+				} else if ("aws_redshift_subnet_group".equals(type)) {
+					ResourceRedshiftSubnetGroup tfAttr = gson.fromJson(jsonElement, ResourceRedshiftSubnetGroup.class);
+					tfAttr.tfName = tfName;
+					tfAttr.parseIds(jsonElement.getAsJsonObject().entrySet());
+					tfObjectsWarehouse.rRedshiftSubnetGroups.put(objectKey, (ResourceRedshiftSubnetGroup) tfAttr);
 				} else {
 					System.out.println("Unknown respource type: " + type);
 				}

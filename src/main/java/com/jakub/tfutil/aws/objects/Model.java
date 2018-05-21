@@ -9,9 +9,11 @@ import com.jakub.tfutil.aws.data.DataAmi;
 import com.jakub.tfutil.aws.data.DataSubnetIds;
 import com.jakub.tfutil.aws.data.DataVpc;
 import com.jakub.tfutil.aws.resources.ResourceEip;
+import com.jakub.tfutil.aws.resources.ResourceElasticacheSubnetGroup;
 import com.jakub.tfutil.aws.resources.ResourceInstance;
 import com.jakub.tfutil.aws.resources.ResourceInternetGateway;
 import com.jakub.tfutil.aws.resources.ResourceNatGateway;
+import com.jakub.tfutil.aws.resources.ResourceRedshiftSubnetGroup;
 import com.jakub.tfutil.aws.resources.ResourceRoute;
 import com.jakub.tfutil.aws.resources.ResourceRouteTable;
 import com.jakub.tfutil.aws.resources.ResourceRouteTableAssociation;
@@ -39,6 +41,9 @@ public class Model {
 	public HashMap<String, VpcDhcpOptions> vpcDhcpOptionss = new HashMap<>();
 	public HashMap<String, VpcDhcpOptionsAssociation> vpcDhcpOptionsAssociations = new HashMap<>();
 	public HashMap<String, Ami> amis = new HashMap<>();
+	public HashMap<String, ElasticacheSubnetGroup> elasticacheSubnetGroups = new HashMap<>();
+	public HashMap<String, RedshiftSubnetGroup> redshiftSubnetGroups = new HashMap<>();
+	
 	
 	@Override
 	public String toString()
@@ -142,7 +147,16 @@ public class Model {
 			DataAmi item = tfObjectsWarehouse.dAmis.get(key);
 			amis.put(key, new Ami(item));
 		}
-				
+		
+		for (String key : tfObjectsWarehouse.rElasticacheSubnetGroups.keySet()) {
+			ResourceElasticacheSubnetGroup item = tfObjectsWarehouse.rElasticacheSubnetGroups.get(key);
+			elasticacheSubnetGroups.put(key, new ElasticacheSubnetGroup(item));
+		}
+
+		for (String key : tfObjectsWarehouse.rRedshiftSubnetGroups.keySet()) {
+			ResourceRedshiftSubnetGroup item = tfObjectsWarehouse.rRedshiftSubnetGroups.get(key);
+			redshiftSubnetGroups.put(key, new RedshiftSubnetGroup(item));
+		}
 	}
 
 	private HashSet<String> findAvailabilityZonesInVpc(String idVpc){
@@ -302,5 +316,60 @@ public class Model {
 		}
 		return matchingElements;		
 	}
+	
+	public HashMap<String, ElasticacheSubnetGroup> findElasticacheSubnetGroupInVpc(String idVpc) {
+		//find all subnets in VPC
+		HashMap<String, Subnet> subnetsInVpc = new HashMap<>();
+		for (String id : subnets.keySet()) {
+			Subnet subnet = subnets.get(id);
+			if (subnet.vpc_id.equals(idVpc)){
+				subnetsInVpc.put(id, subnet);
+			}
+		}
+		if (subnetsInVpc.size()==0){
+			return null;
+		}
+		//and check if any of them is in the group. If so, that group is in the VPC
+		HashMap<String, ElasticacheSubnetGroup> matchingElasticacheSubnetGroups = new HashMap<>();
+
+		for (String id : elasticacheSubnetGroups.keySet()) {
+			ElasticacheSubnetGroup elasticacheSubnetGroup = elasticacheSubnetGroups.get(id);
+			HashSet<String> subnetIds = elasticacheSubnetGroup.subnetIds;
+			for (String idSubnetsInVpc : subnetsInVpc.keySet()) {
+				if (subnetIds.contains(idSubnetsInVpc)){
+					matchingElasticacheSubnetGroups.put(id, elasticacheSubnetGroup);
+				}
+			}			
+		}
+		return matchingElasticacheSubnetGroups;
+	}
+	
+	public HashMap<String, RedshiftSubnetGroup> findRedshiftSubnetGroupInVpc(String idVpc) {
+		//find all subnets in VPC
+		HashMap<String, Subnet> subnetsInVpc = new HashMap<>();
+		for (String id : subnets.keySet()) {
+			Subnet subnet = subnets.get(id);
+			if (subnet.vpc_id.equals(idVpc)){
+				subnetsInVpc.put(id, subnet);
+			}
+		}
+		if (subnetsInVpc.size()==0){
+			return null;
+		}
+		//and check if any of them is in the group. If so, that group is in the VPC
+		HashMap<String, RedshiftSubnetGroup> matchingRedshiftSubnetGroups = new HashMap<>();
+
+		for (String id : redshiftSubnetGroups.keySet()) {
+			RedshiftSubnetGroup redshiftSubnetGroup = redshiftSubnetGroups.get(id);
+			HashSet<String> subnetIds = redshiftSubnetGroup.subnetIds;
+			for (String idSubnetsInVpc : subnetsInVpc.keySet()) {
+				if (subnetIds.contains(idSubnetsInVpc)){
+					matchingRedshiftSubnetGroups.put(id, redshiftSubnetGroup);
+				}
+			}			
+		}
+		return matchingRedshiftSubnetGroups;
+	}
+	
 		
 }
