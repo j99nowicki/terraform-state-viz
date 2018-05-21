@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import com.jakub.tfutil.aws.data.DataAmi;
 import com.jakub.tfutil.aws.data.DataSubnetIds;
 import com.jakub.tfutil.aws.data.DataVpc;
 import com.jakub.tfutil.aws.resources.ResourceEip;
@@ -43,6 +44,7 @@ public class TfObjectsWarehouse {
 
 	public HashMap<String, DataSubnetIds> dSubnetIdss;
 	public HashMap<String, DataVpc> dVpcs;
+	public HashMap<String, DataAmi> dAmis;
 
 	public TfObjectsWarehouse() {
 		this.rVpcs = new HashMap<>();
@@ -64,7 +66,9 @@ public class TfObjectsWarehouse {
 
 		this.dSubnetIdss = new HashMap<>();
 		this.dVpcs = new HashMap<>();
+		this.dAmis = new HashMap<>();
 	}
+	
 	@Override
 	public String toString()
 	{
@@ -73,7 +77,5 @@ public class TfObjectsWarehouse {
 	
 	public String sufixFrom(String key){
 		return key.substring(key.indexOf(".")+1, key.length());
-	}
-
-	
+	}	
 }

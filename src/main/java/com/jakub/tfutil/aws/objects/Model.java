@@ -2,10 +2,10 @@ package com.jakub.tfutil.aws.objects;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.concurrent.ConcurrentHashMap.KeySetView;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import com.jakub.tfutil.TfObjectsWarehouse;
+import com.jakub.tfutil.aws.data.DataAmi;
 import com.jakub.tfutil.aws.data.DataSubnetIds;
 import com.jakub.tfutil.aws.data.DataVpc;
 import com.jakub.tfutil.aws.resources.ResourceEip;
@@ -38,6 +38,7 @@ public class Model {
 	public HashMap<String, VpcEndpoinRouteTableAssociation> vpcEndpoinRouteTableAssociation = new HashMap<>();
 	public HashMap<String, VpcDhcpOptions> vpcDhcpOptionss = new HashMap<>();
 	public HashMap<String, VpcDhcpOptionsAssociation> vpcDhcpOptionsAssociations = new HashMap<>();
+	public HashMap<String, Ami> amis = new HashMap<>();
 	
 	@Override
 	public String toString()
@@ -135,7 +136,12 @@ public class Model {
 		for (String key : tfObjectsWarehouse.rVpcDhcpOptionsAssociations.keySet()){
 			ResourceVpcDhcpOptionsAssociation item = tfObjectsWarehouse.rVpcDhcpOptionsAssociations.get(key);
 			vpcDhcpOptionsAssociations.put(key, new VpcDhcpOptionsAssociation(item));
-		}		
+		}	
+		
+		for (String key : tfObjectsWarehouse.dAmis.keySet()) {
+			DataAmi item = tfObjectsWarehouse.dAmis.get(key);
+			amis.put(key, new Ami(item));
+		}
 				
 	}
 
@@ -296,5 +302,5 @@ public class Model {
 		}
 		return matchingElements;		
 	}
-	
+		
 }

@@ -14,6 +14,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.jakub.tfutil.aws.TfAttributes;
+import com.jakub.tfutil.aws.data.DataAmi;
 import com.jakub.tfutil.aws.data.DataSubnetIds;
 import com.jakub.tfutil.aws.data.DataVpc;
 import com.jakub.tfutil.aws.resources.ResourceEip;
@@ -96,6 +97,10 @@ public class TfObjectWarehouseBuilder{
 					TfAttributes tfAttr = gson.fromJson(jsonElement, DataVpc.class);
 					tfAttr.tfName = tfName;
 					tfObjectsWarehouse.dVpcs.put(objectKey, (DataVpc) tfAttr);
+				} else if ("aws_ami".equals(type)) {
+					TfAttributes tfAttr = gson.fromJson(jsonElement, DataAmi.class);
+					tfAttr.tfName = tfName;
+					tfObjectsWarehouse.dAmis.put(objectKey, (DataAmi) tfAttr);
 				} else if ("aws_vpc_endpoint_service".equals(type)){
 					System.out.println("Unsupported data type: " + type +". This data type is only used for filtering and does not return id.");					
 				} else {
