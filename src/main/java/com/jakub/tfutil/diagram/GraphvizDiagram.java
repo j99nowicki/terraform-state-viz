@@ -66,7 +66,12 @@ public class GraphvizDiagram{
 "        node [style=filled,color=white, shape=box];\n"+
 "        label = \"VPC: "+ vpc.tagsName+" ("+ vpc.id+")\";\n"+
 "        \""+vpc.id+"\" [label = \"{tfName: "+ vpc.tfName +"|id: "+idVpc+"| cidr_block: "+vpc.cidr_block+"}\" shape = \"record\" ];\n");
-
+			
+			
+//Security Groups
+			if (showSecurityGroups){
+				GraphvizSecurityGroup.printSecurityGroups(diagram, model, idVpc);
+			}
 //Gateways		
 			printGateways(idVpc);
 
@@ -74,10 +79,6 @@ public class GraphvizDiagram{
 			for (String zone : showZonesInVpc) {
 				allDisplayedZonesInVpc.add(zone);
 				GraphvizAvailiabilityZone.printAvailiabilityZone(diagram, model, idVpc, zone);
-			}
-
-			if (showSecurityGroups){
-				GraphvizSecurityGroup.printSecurityGroups(diagram, model, idVpc);
 			}
 			
 //Route tables

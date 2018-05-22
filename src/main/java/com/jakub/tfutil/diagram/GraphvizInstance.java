@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import com.jakub.tfutil.aws.objects.Instance;
 import com.jakub.tfutil.aws.objects.Model;
-import com.jakub.tfutil.aws.objects.SecurityGroup;
 
 public class GraphvizInstance {
 	
@@ -26,13 +25,17 @@ public class GraphvizInstance {
 			diagram.append(					
 "                }\n");
 			}
-			//show security groups associations
-			HashMap<String, Instance> matchingElements = new HashMap<>();
-			for (String id : instances.keySet()) {
-				Instance instance = instances.get(id);
-//				if (GraphvizDiagram.allDisplayedSecurityGroups.containsKey(instance.security_groups_count){
-//					
-//				}
+			if (GraphvizDiagram.showSecurityGroupAssociationsToinstances){
+				//show security groups associations from visible security groups to instances in this subnet
+				for (String idInstance : instances.keySet()) {
+					Instance instance = instances.get(idInstance);
+					for (String securityGroup : instance.vpSecurityGroupIds){
+						if (GraphvizDiagram.allDisplayedSecurityGroups.containsKey(securityGroup)){
+							diagram.append(
+"                \""+ idInstance+"\" -> \""+ securityGroup  +"\" [label = \""+securityGroup +"-"+ idInstance+"\" dir=none, style=dashed]\n");
+						}
+					}
+				}
 			}
 		}
 }

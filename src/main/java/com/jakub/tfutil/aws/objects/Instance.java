@@ -1,5 +1,7 @@
 package com.jakub.tfutil.aws.objects;
 
+import java.util.HashSet;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import com.jakub.tfutil.aws.resources.ResourceInstance;
@@ -39,7 +41,8 @@ public class Instance extends TfObject{
 	public int tagsCount;
 	public String tagsName;
 	public int vpc_security_group_ids_count;
-	
+	public HashSet<String> vpSecurityGroupIds;
+
 	private ResourceInstance resourceInstance;
 	
 	public Instance(ResourceInstance resourceInstance) {
@@ -78,6 +81,7 @@ public class Instance extends TfObject{
 		this.tagsCount = resourceInstance.tagsCount;
 		this.tagsName = resourceInstance.tagsName;
 		this.vpc_security_group_ids_count = resourceInstance.vpc_security_group_ids_count;
+		this.vpSecurityGroupIds = resourceInstance.vpSecurityGroupIds;
 		
 		resource = true;
 	}

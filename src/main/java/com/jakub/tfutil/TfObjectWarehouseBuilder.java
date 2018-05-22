@@ -110,8 +110,9 @@ public class TfObjectWarehouseBuilder{
 				}
 			} else {
 				if ("aws_instance".equals(type)) {
-					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceInstance.class);
+					ResourceInstance tfAttr = gson.fromJson(jsonElement, ResourceInstance.class);
 					tfAttr.tfName = tfName;
+					tfAttr.parseVpSecurityGroupIds(jsonElement.getAsJsonObject().entrySet());
 					tfObjectsWarehouse.rInstances.put(objectKey, (ResourceInstance) tfAttr);
 				} else if ("aws_vpc_endpoint".equals(type)) {
 					TfAttributes tfAttr = gson.fromJson(jsonElement, ResourceVpcEndpoint.class);

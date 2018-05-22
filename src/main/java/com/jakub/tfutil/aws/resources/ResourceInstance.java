@@ -1,7 +1,12 @@
 package com.jakub.tfutil.aws.resources;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Map.Entry;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 
 public class ResourceInstance extends TfResource{
@@ -48,8 +53,18 @@ public class ResourceInstance extends TfResource{
 	public String tagsName;
 	@SerializedName("vpc_security_group_ids.#")
 	public int vpc_security_group_ids_count;
-//    "vpc_security_group_ids.826112338": "sg-622ff51f"
 
+	public HashSet<String> vpSecurityGroupIds;
+	
+	//custom parser for vpc_security_group_ids set
+	public void parseVpSecurityGroupIds(Set<Entry<String, JsonElement>> entrySet ){
+		vpSecurityGroupIds = new HashSet<String>();
+		for (Entry<String, JsonElement> entry : entrySet) {
+			if (entry.getKey().startsWith("vpc_security_group_ids.") && !entry.getKey().startsWith("vpc_security_group_ids.#")){
+				vpSecurityGroupIds.add(entry.getValue().getAsString());
+			}
+		}
+	}
     public String toString()
     {
       return ToStringBuilder.reflectionToString(this);
