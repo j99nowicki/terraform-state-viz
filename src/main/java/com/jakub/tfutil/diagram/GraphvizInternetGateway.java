@@ -15,7 +15,7 @@ public class GraphvizInternetGateway {
 			String style = (igw.isResource()?"filled":"dashed");
 			diagram.append(
 "            subgraph cluster_"+(GraphvizDiagram.c++)+" {\n"+
-"                \"icon"+idIgw+"\" [label=\"RInternet GW\" shape=lpromoter]\n"+
+"                \"icon"+idIgw+"\" [label=\"Internet GW\" shape=lpromoter]\n"+
 "                node [style=filled];\n"+
 "                color=red;\n"+
 "                style=\""+style+",rounded\" label = \"Internet GW: "+ igw.tagsName+"\"\n"+

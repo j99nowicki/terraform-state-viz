@@ -8,6 +8,7 @@ import com.jakub.tfutil.TfObjectsWarehouse;
 import com.jakub.tfutil.aws.objects.InternetGateway;
 import com.jakub.tfutil.aws.objects.Model;
 import com.jakub.tfutil.aws.objects.NatGateway;
+import com.jakub.tfutil.aws.objects.SecurityGroup;
 import com.jakub.tfutil.aws.objects.Vpc;
 import com.jakub.tfutil.aws.objects.VpcEndpoint;
 import com.jakub.tfutil.aws.objects.VpnGateway;
@@ -23,6 +24,8 @@ public class GraphvizDiagram{
 	private static boolean showRedshiftSubnetGroup = true;
 	static boolean showElasticacheSubnetGroupAssociationsToSubnets = true;
 	static boolean showRedshiftSubnetGroupAssociationsToSubnets = true;
+	private static boolean showSecurityGroups = true;
+	static boolean showSecurityGroupAssociationsToinstances = true;
 	
 	private StringBuffer diagram = new StringBuffer();
 	static int c=0;
@@ -30,6 +33,7 @@ public class GraphvizDiagram{
 	static HashMap<String, VpnGateway> allDisplayedVpnGws = new HashMap<String, VpnGateway>();
 	static HashMap<String, VpcEndpoint> allDisplayedVpcEndpoints = new HashMap<String, VpcEndpoint>();
 	static HashMap<String, NatGateway> displayedNatGws = new HashMap<String, NatGateway>();
+	static HashMap<String, SecurityGroup> allDisplayedSecurityGroups = new HashMap<String, SecurityGroup>();
 	
 	private Model model;
 	
@@ -72,10 +76,15 @@ public class GraphvizDiagram{
 				GraphvizAvailiabilityZone.printAvailiabilityZone(diagram, model, idVpc, zone);
 			}
 
+			if (showSecurityGroups){
+				GraphvizSecurityGroup.printSecurityGroups(diagram, model, idVpc);
+			}
+			
 //Route tables
 			if (showRouteTables){
 				GraphvizRouteTable.printRouteTables(diagram, model, idVpc, allDisplayedZonesInVpc);
 			}
+			
 			if (showVpcDhcpOptions){
 				GraphvizVpcDhcpOptions.printVpcDhcpOptions(diagram, model, idVpc);
 			}

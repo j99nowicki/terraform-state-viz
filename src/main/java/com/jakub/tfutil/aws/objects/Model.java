@@ -17,6 +17,7 @@ import com.jakub.tfutil.aws.resources.ResourceRedshiftSubnetGroup;
 import com.jakub.tfutil.aws.resources.ResourceRoute;
 import com.jakub.tfutil.aws.resources.ResourceRouteTable;
 import com.jakub.tfutil.aws.resources.ResourceRouteTableAssociation;
+import com.jakub.tfutil.aws.resources.ResourceSecurityGroup;
 import com.jakub.tfutil.aws.resources.ResourceSubnet;
 import com.jakub.tfutil.aws.resources.ResourceVpc;
 import com.jakub.tfutil.aws.resources.ResourceVpcDhcpOptions;
@@ -43,6 +44,7 @@ public class Model {
 	public HashMap<String, Ami> amis = new HashMap<>();
 	public HashMap<String, ElasticacheSubnetGroup> elasticacheSubnetGroups = new HashMap<>();
 	public HashMap<String, RedshiftSubnetGroup> redshiftSubnetGroups = new HashMap<>();
+	public HashMap<String, SecurityGroup> securityGroups = new HashMap<>();
 	
 	
 	@Override
@@ -157,6 +159,12 @@ public class Model {
 			ResourceRedshiftSubnetGroup item = tfObjectsWarehouse.rRedshiftSubnetGroups.get(key);
 			redshiftSubnetGroups.put(key, new RedshiftSubnetGroup(item));
 		}
+		
+		for (String key : tfObjectsWarehouse.rSecurityGroups.keySet()) {
+			ResourceSecurityGroup item = tfObjectsWarehouse.rSecurityGroups.get(key);
+			securityGroups.put(key, new SecurityGroup(item));
+		}
+		
 	}
 
 	private HashSet<String> findAvailabilityZonesInVpc(String idVpc){
@@ -371,5 +379,15 @@ public class Model {
 		return matchingRedshiftSubnetGroups;
 	}
 	
-		
+	public HashMap<String, SecurityGroup> findSecurityGroupsInVpc(String idVpc) {
+		HashMap<String, SecurityGroup> matchingElements = new HashMap<>();
+		for (String id : securityGroups.keySet()) {
+			SecurityGroup element = securityGroups.get(id);
+			if (element.vpc_id.equals(idVpc)){
+				matchingElements.put(id, element);
+			}
+		}
+		return matchingElements;
+	}		
+	
 }
