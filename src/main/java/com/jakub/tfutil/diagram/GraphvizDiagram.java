@@ -25,7 +25,8 @@ public class GraphvizDiagram{
 	static boolean showElasticacheSubnetGroupAssociationsToSubnets = true;
 	static boolean showRedshiftSubnetGroupAssociationsToSubnets = true;
 	private static boolean showSecurityGroups = true;
-	static boolean showSecurityGroupAssociationsToinstances = true;
+	static boolean showSecurityGroupAssociationsToInstances = true;
+	static boolean showEipInInstances = true;
 	
 	private StringBuffer diagram = new StringBuffer();
 	static int c=0;

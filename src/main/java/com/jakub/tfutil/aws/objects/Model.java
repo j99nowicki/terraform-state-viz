@@ -390,4 +390,15 @@ public class Model {
 		return matchingElements;
 	}		
 	
+	public HashMap<String, Eip> findEipsForInstance(String idInstance) {
+		HashMap<String, Eip> matchingElements = new HashMap<>();
+		for (String id : eips.keySet()) {
+			Eip element = eips.get(id);
+			if (element.instance.equals(idInstance)){
+				matchingElements.put(id, element);
+			}
+		}
+		return matchingElements;
+	}	
+	
 }

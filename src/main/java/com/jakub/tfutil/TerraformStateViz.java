@@ -22,7 +22,9 @@ public class TerraformStateViz{
         System.out.println();
         System.out.println();
         
-        String fileName = "src\\main\\resources\\terraformDoubleVpc.tfstate";
+//        String fileName = "src\\main\\resources\\terraformDoubleVpc.tfstate";
+//        String fileName = "src\\main\\resources\\tf-docker-ami.backup";
+        String fileName = "src\\main\\resources\\terraform5.tfstate";
 //        String fileName = "src\\main\\resources\\terraform.tfstate";
 //        String fileName = "src\\main\\resources\\terraformVpcSecGrEc2.tfstate";
 //        String fileName = "src\\main\\resources\\terraform_ireland.tfstate";
