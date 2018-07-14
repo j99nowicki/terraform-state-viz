@@ -1,40 +1,94 @@
 package com.jakub.tfutil;
 
-import java.io.IOException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.jakub.tfutil.diagram.GraphvizDiagram;
 
 public class TerraformStateViz{
 
 	static final Logger logger = Logger.getLogger(TerraformStateViz.class);
-	static Gson gson = new GsonBuilder().create();
+	static String sourceFilePathName = null;
+	static String outputFileName = null;
 
-	public static void main(String[] args) throws IOException{
+	public static void main(String[] args){
 		logger.info("Start");
 		
-        Gson gson = new GsonBuilder().create();
-        gson.toJson("Hello", System.out);
-        gson.toJson(123, System.out);
-        System.out.println();
-        System.out.println();
-        
-//        String fileName = "src\\main\\resources\\terraformDoubleVpc.tfstate";
-//        String fileName = "src\\main\\resources\\tf-docker-ami.backup";
-        String fileName = "src\\main\\resources\\terraform5.tfstate";
-//        String fileName = "src\\main\\resources\\terraform.tfstate";
-//        String fileName = "src\\main\\resources\\terraformVpcSecGrEc2.tfstate";
-//        String fileName = "src\\main\\resources\\terraform_ireland.tfstate";
+	    boolean invocationError = parseArguments(args);
+  	       
+	    if (invocationError){
+	    	logger.error("Exiting");
+	    	return;        	
+	    }
 
-        TfObjectWarehouseBuilder TfObjectWarehouseBuilder = new TfObjectWarehouseBuilder();
-        TfObjectsWarehouse tfObjectsWarehouse = TfObjectWarehouseBuilder.buildTfObjectWarehouse(fileName);
+	    TfObjectWarehouseBuilder TfObjectWarehouseBuilder = new TfObjectWarehouseBuilder();
+        TfObjectsWarehouse tfObjectsWarehouse = TfObjectWarehouseBuilder.buildTfObjectWarehouse(sourceFilePathName);
+
+        if (tfObjectsWarehouse==null){
+        	System.out.println("Exiting");
+        	invocationError = true;
+        }
                 
 		GraphvizDiagram graphvizDiagram = new GraphvizDiagram(tfObjectsWarehouse);
 		String diagram = graphvizDiagram.draw();
-		System.out.println(diagram);
 		
+		logger.info("Writing graphviz diagram to file: " + outputFileName);
+		
+		try (PrintWriter out = new PrintWriter(outputFileName)) {
+			out.println(diagram);
+		} catch (FileNotFoundException e) {
+			e.getMessage();
+		}		
+		logger.info("Success");
+
+	}
+
+	private static boolean parseArguments(String[] args) {
+		Option option_i = Option.builder("i").required(true).argName("input").hasArg().desc("Input file name: tfstate file").build();
+	    Option option_o = Option.builder("o").argName("output").hasArg().desc("Output file name").build();
+	    Options options = new Options();
+	    CommandLineParser parser = new DefaultParser();
+	    options.addOption(option_i);
+	    options.addOption(option_o);
+	    
+	    String header = "Produces graphviz diagram from tfstate file.";
+	    String footer = "";
+	    HelpFormatter formatter = new HelpFormatter();
+	    
+	    boolean invocationError = false;
+	    CommandLine commandLine;
+	    try
+	    {
+	        commandLine = parser.parse(options, args);
+
+	        //requred options are checked by parser
+	        sourceFilePathName = commandLine.getOptionValue("i");
+	        
+	        if (commandLine.hasOption("o"))
+	        {
+				outputFileName = commandLine.getOptionValue("o");
+	        } else {
+	    		File sourceFile = new File(sourceFilePathName);
+	    		String sourceFileName = sourceFile.getName();
+    			outputFileName = sourceFileName .substring(0, sourceFileName.lastIndexOf("."))+".graphviz";
+	        }
+	    }
+	    catch (ParseException exception)
+	    {
+	    	logger.error("Parse error: ");
+	    	logger.error(exception.getMessage());
+    	    formatter.printHelp("java -jar terraform-state-viz-jar-with-dependencies.jar", header, options, footer, true); 
+        	invocationError = true;
+	    }
+		return invocationError;
 	}
 }

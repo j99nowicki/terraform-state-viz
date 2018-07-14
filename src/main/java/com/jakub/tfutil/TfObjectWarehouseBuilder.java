@@ -44,6 +44,9 @@ public class TfObjectWarehouseBuilder{
 
 	public TfObjectsWarehouse buildTfObjectWarehouse(String stateFileName) {
 		JsonObject jsonObject = parseStateFile(stateFileName);
+		if (jsonObject==null){
+			return null;
+		}
 		return buildTfObjectWarehouse(jsonObject);
 	}
 
@@ -57,8 +60,9 @@ public class TfObjectWarehouseBuilder{
 			jsonObject = jsonElement.getAsJsonObject();
 			return jsonObject;
 		} catch (FileNotFoundException e) {
+			System.err.println("Error when trying to open tfstate file: " + e.getMessage());
 		}
-		return jsonObject;
+		return null;
 	}
 	
 	private TfObjectsWarehouse buildTfObjectWarehouse(JsonObject stateJson) {

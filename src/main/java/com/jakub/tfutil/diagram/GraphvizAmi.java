@@ -7,7 +7,13 @@ public class GraphvizAmi {
 	
 	public static void printAmi(StringBuffer diagram, Model model, String idInstance, String idAmi) {
 		Ami ami = model.amis.get(idAmi);
-		String style = (ami.isResource()?"filled":"dashed");
+		String style = null;
+		if (ami==null){
+			//AMI is referenced directly as a string
+			style = ("dashed");			
+		} else {
+			style = (ami.isResource()?"filled":"dashed");			
+		}
 		diagram.append(			
 "                    \""+idInstance+"-"+idAmi+"\" [label=\"Ami\" shape=invhouse style="+style+" color=azure2]\n");
 	}
